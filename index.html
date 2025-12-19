@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Tree Explorer Pro</title>
-    
+    <title>Family Archive: Tree, Timeline & Gallery</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -13,123 +12,90 @@
             --line-color: #bbb;
             --male-color: #3498db;
             --female-color: #e91e63;
-            --other-color: #95a5a6;
             --bg-color: #f0f2f5;
             --sidebar-width: 350px;
         }
 
-        body { margin: 0; overflow: hidden; background-color: var(--bg-color); font-family: 'Segoe UI', sans-serif; }
+        body { margin: 0; overflow: hidden; background-color: var(--bg-color); font-family: 'Segoe UI', Tahoma, sans-serif; }
 
-        /* --- Password Gate Styles --- */
-        #password-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #2c3e50; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 9999;
-            color: white; text-align: center;
-        }
-        #password-overlay input {
-            padding: 12px; border-radius: 5px; border: none; width: 250px;
-            margin-bottom: 10px; font-size: 16px; text-align: center; outline: none;
-        }
-        #password-overlay button { background: #27ae60; padding: 10px 25px; font-weight: bold; border: none; color: white; border-radius: 4px; cursor: pointer; }
-        .error-msg { color: #e74c3c; font-size: 14px; margin-top: 10px; display: none; }
-
-        /* --- Main UI Elements --- */
-        #tree-wrapper { opacity: 0; transition: opacity 0.5s ease-in; display: inline-block; }
+        /* --- Security & Loading --- */
+        #password-overlay { position: fixed; inset: 0; background: #2c3e50; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
+        #password-overlay input { padding: 12px; border-radius: 4px; border: none; margin: 10px; text-align: center; width: 220px; }
+        #tree-wrapper { opacity: 0; transition: opacity 0.5s; display: inline-block; }
         #tree-wrapper.ready { opacity: 1; }
+        .hidden { display: none !important; }
 
+        /* --- UI Controls --- */
         .ui-layer { position: fixed; z-index: 1000; padding: 20px; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .ui-layer * { pointer-events: auto; }
-        .search-box { display: flex; gap: 5px; background: white; padding: 5px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        input[type="text"] { border: 1px solid #ddd; padding: 8px; border-radius: 4px; outline: none; width: 180px; }
+        .btn-group { display: flex; gap: 8px; }
+        .action-btn { cursor: pointer; background: #333; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 13px; }
         
-        .btn-group { display: flex; gap: 5px; }
-        button.action-btn { cursor: pointer; background: #333; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; font-size: 12px; }
-        .export-btn { background: #27ae60 !important; }
-        .reset-btn { background: #7f8c8d !important; }
+        .dropdown { position: relative; }
+        .dropdown-content { display: none; position: absolute; background: white; min-width: 160px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-radius: 4px; top: 100%; }
+        .dropdown-content a { color: black; padding: 12px; text-decoration: none; display: block; cursor: pointer; }
+        .dropdown-content a:hover { background: #f1f1f1; }
+        .dropdown:hover .dropdown-content { display: block; }
 
-        .filter-bar { background: white; padding: 8px; border-radius: 8px; font-size: 11px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; gap: 8px; align-items: center; }
-        .filter-btn { background: #eee; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; }
-
-        /* --- Sidebar --- */
-        #sidebar {
-            position: fixed; top: 0; right: -400px; width: var(--sidebar-width); height: 100%;
-            background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); transition: 0.3s ease;
-            z-index: 2000; padding: 25px; box-sizing: border-box; overflow-y: auto;
-        }
-        #sidebar.open { right: 0; }
-        .close-sidebar { cursor: pointer; float: right; font-size: 24px; color: #888; font-weight: bold; }
-        #side-img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; background: #eee; }
-
-        /* --- Tree Connections --- */
+        /* --- Tree Visualization --- */
         #viewport { width: 100vw; height: 100vh; cursor: grab; }
-        .tree ul { padding-top: 25px; position: relative; display: flex; justify-content: center; margin: 0; padding-left: 0; }
+        .tree ul { padding-top: 25px; position: relative; display: flex; justify-content: center; padding-left: 0; margin: 0; }
         .tree li { text-align: center; list-style-type: none; position: relative; padding: 25px 10px 0 10px; }
         .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid var(--line-color); width: 50%; height: 25px; }
         .tree li::after { right: auto; left: 50%; border-left: 2px solid var(--line-color); }
-        .tree li:only-child::after, .tree li:only-child::before { display: none; }
-        .tree li:only-child { padding-top: 0; }
-        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
-        .tree li:last-child::before { border-right: 2px solid var(--line-color); border-radius: 0 5px 0 0; }
-        .tree li:first-child::after { border-radius: 5px 0 0 0; }
         .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid var(--line-color); width: 0; height: 25px; }
 
-        /* --- Cards & Person Styles --- */
-        .couple { display: inline-flex; align-items: center; gap: 10px; background: white; padding: 10px; border-radius: 12px; border: 1px solid #ddd; position: relative; }
-        .spouse-connector { width: 20px; height: 2px; background: var(--line-color); }
-        .person-card { position: relative; width: 80px; text-align: center; cursor: pointer; }
-        .person-card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #eee; display: block; margin: 0 auto; transition: 0.3s; }
-        .person-card span { display: block; font-size: 11px; font-weight: bold; margin-top: 5px; color: #333; }
-        
-        .male img { border: 3px solid var(--male-color); }
-        .female img { border: 3px solid var(--female-color); }
-        .other img { border: 3px solid var(--other-color); }
-
-        .tooltip {
-            visibility: hidden; width: 140px; background: #333; color: #fff; text-align: left;
-            border-radius: 6px; padding: 8px; position: absolute; z-index: 100; bottom: 125%;
-            left: 50%; margin-left: -70px; opacity: 0; transition: 0.3s; font-size: 10px; pointer-events: none;
-        }
-        .person-card:hover .tooltip { visibility: visible; opacity: 1; }
-        .highlight img { filter: drop-shadow(0 0 10px #f1c40f); transform: scale(1.15); }
+        /* --- Card Styles --- */
+        .couple-group { display: inline-flex; align-items: center; gap: 8px; background: white; padding: 10px; border-radius: 12px; border: 1px solid #ddd; position: relative; }
+        .marriage-label { font-size: 9px; color: #888; background: #fff; padding: 0 3px; position: relative; z-index: 2; border: 1px solid #eee; border-radius: 3px; }
+        .spouse-connector { width: 20px; height: 2px; background: var(--line-color); flex-shrink: 0; }
+        .person-card { width: 75px; text-align: center; cursor: pointer; position: relative; }
+        .person-card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #ccc; display: block; margin: 0 auto; }
+        .male img { border-color: var(--male-color); }
+        .female img { border-color: var(--female-color); }
+        .person-card span { display: block; font-size: 11px; font-weight: bold; margin-top: 5px; }
         .collapsed ul { display: none !important; }
+
+        /* --- Sidebar & Gallery & Timeline --- */
+        #sidebar { position: fixed; top: 0; right: -400px; width: var(--sidebar-width); height: 100%; background: white; z-index: 2000; padding: 30px; transition: 0.3s; box-shadow: -5px 0 15px rgba(0,0,0,0.1); overflow-y: auto; box-sizing: border-box; }
+        #sidebar.open { right: 0; }
+        #timeline-wrapper, #gallery-wrapper { height: 100vh; overflow-y: auto; padding: 100px 50px; background: var(--bg-color); box-sizing: border-box; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
+        .gallery-item { background: white; padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; }
+        .gallery-item img { width: 100%; height: 150px; object-fit: cover; border-radius: 5px; }
+
+        .timeline-item { display: flex; align-items: center; gap: 20px; background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 5px solid #333; max-width: 600px; margin-inline: auto; }
     </style>
 </head>
 <body>
 
 <div id="password-overlay">
-    <h1 style="margin-bottom: 5px;">Family Archive</h1>
-    <p style="opacity: 0.8; margin-bottom: 20px;">Private access for relatives only</p>
-    <input type="password" id="passInput" placeholder="Enter Family Code">
-    <button onclick="checkPassword()">Unlock Tree</button>
-    <p id="error" class="error-msg">Invalid Code. Please check with the administrator.</p>
+    <h2>Family Vault</h2>
+    <input type="password" id="passInput" placeholder="Access Code">
+    <button class="action-btn" onclick="checkPassword()" style="background:#27ae60;">Unlock Tree</button>
 </div>
 
 <div id="sidebar">
-    <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
-    <img id="side-img" src="" alt="Photo">
-    <h2 id="side-name" style="margin-top:0;"></h2>
-    <p><strong>Birth:</strong> <span id="side-born"></span></p>
-    <p><strong>Died:</strong> <span id="side-died"></span></p>
-    <p><strong>Occupation:</strong> <span id="side-job"></span></p>
-    <hr>
-    <p id="side-bio"></p>
+    <span onclick="closeSidebar()" style="cursor:pointer; float:right; font-size: 24px;">&times;</span>
+    <img id="side-img" style="width:100%; border-radius:8px; margin-bottom: 20px;">
+    <h2 id="side-name" style="margin: 0 0 5px 0;"></h2>
+    <p id="side-meta" style="color: #666; font-size: 14px; margin-bottom: 20px;"></p>
+    <hr style="border: 0; border-top: 1px solid #eee;">
+    <p id="side-bio" style="line-height: 1.6; color: #444;"></p>
 </div>
 
 <div class="ui-layer">
-    <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search by name..." onkeypress="if(event.key === 'Enter') searchPerson()">
-        <button class="action-btn" onclick="searchPerson()" style="padding: 8px;">Find</button>
-    </div>
     <div class="btn-group">
-        <button class="action-btn reset-btn" onclick="resetView()">Reset View</button>
-        <button class="action-btn export-btn" onclick="exportTree()">Save Image</button>
-    </div>
-    <div class="filter-bar">
-        <span>Filter:</span>
-        <button class="filter-btn" onclick="filterTree('all')">All</button>
-        <button class="filter-btn" onclick="filterTree('living')">Living</button>
-        <button class="filter-btn" onclick="filterTree('deceased')">Deceased</button>
+        <div class="dropdown">
+            <button class="action-btn" id="viewToggle">Tree View ▼</button>
+            <div class="dropdown-content">
+                <a onclick="switchView('tree')">Tree View</a>
+                <a onclick="switchView('timeline')">Timeline</a>
+                <a onclick="switchView('gallery')">Gallery</a>
+            </div>
+        </div>
+        <button class="action-btn" onclick="resetView()">Reset Tree</button>
+        <button class="action-btn" onclick="exportTree()" style="background:#2ecc71;">Export Image</button>
     </div>
 </div>
 
@@ -137,140 +103,136 @@
     <div id="tree-wrapper" class="tree"></div>
 </div>
 
-<script>
-    // --- 1. CONFIGURATION ---
-    const FAMILY_CODE = "TRLFamily2025"; // Change this to your desired password
+<div id="timeline-wrapper" class="hidden"></div>
+<div id="gallery-wrapper" class="hidden"><div class="gallery-grid" id="gallery-content"></div></div>
 
+<script>
+    const FAMILY_CODE = "Family2025";
+    let globalData = null;
     const wrapper = document.getElementById('tree-wrapper');
     const viewport = d3.select("#viewport");
-    const content = d3.select("#tree-wrapper");
-    const zoom = d3.zoom().scaleExtent([0.1, 3]).on("zoom", (e) => {
-        content.style("transform", `translate(${e.transform.x}px, ${e.transform.y}px) scale(${e.transform.k})`);
-    });
+    const zoom = d3.zoom().scaleExtent([0.1, 3]).on("zoom", (e) => d3.select("#tree-wrapper").style("transform", `translate(${e.transform.x}px, ${e.transform.y}px) scale(${e.transform.k})`));
 
-    // --- 2. PASSWORD CHECK ---
     function checkPassword() {
-        const input = document.getElementById('passInput').value;
-        const error = document.getElementById('error');
-        if (input === FAMILY_CODE) {
-            document.getElementById('password-overlay').style.display = 'none';
-            initTree();
-        } else {
-            error.style.display = 'block';
-        }
+        if(document.getElementById('passInput').value === FAMILY_CODE) {
+            document.getElementById('password-overlay').classList.add('hidden');
+            init();
+        } else { alert("Wrong code!"); }
     }
-    document.getElementById('passInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') checkPassword(); });
 
-    // --- 3. CORE LOGIC ---
-    function renderPerson(person) {
-        const id = "node-" + person.name.replace(/\s+/g, '-').toLowerCase();
-        const pData = JSON.stringify(person).replace(/"/g, '&quot;');
-        const status = (person.died && person.died !== "Living") ? "Deceased" : "Living";
-        
+    function init() {
+        fetch('familyData.json')
+            .then(res => res.json())
+            .then(data => {
+                globalData = data;
+                wrapper.appendChild(createTree(data));
+                viewport.call(zoom);
+                resetView();
+                setTimeout(() => wrapper.classList.add('ready'), 200);
+            });
+    }
+
+    function renderPerson(p) {
+        const pData = JSON.stringify(p).replace(/"/g, '&quot;');
         return `
-            <div class="person-card ${person.gender || 'other'}" id="${id}" data-person="${pData}">
-                <img src="${person.img}" onclick="event.stopPropagation(); toggleBranch(this)" onerror="this.src='https://via.placeholder.com/60'">
-                <span onclick="showDetails(${pData})">${person.name}</span>
-                <div class="tooltip">
-                    <strong>${person.name}</strong><br>
-                    Born: ${person.born || '?'}<br>
-                    Status: ${status}
-                </div>
+            <div class="person-card ${p.gender}" onclick="showDetails(${pData})">
+                <img src="${p.img}" onerror="this.src='https://via.placeholder.com/60'">
+                <span>${p.name}</span>
             </div>
         `;
     }
 
     function createTree(data) {
         const ul = document.createElement('ul');
-        data.forEach(member => {
+        data.forEach(m => {
             const li = document.createElement('li');
-            const coupleDiv = document.createElement('div');
-            coupleDiv.className = 'couple';
-            let html = renderPerson(member);
-            if (member.spouse) {
-                html += `<div class="spouse-connector"></div>`;
-                html += renderPerson(member.spouse);
+            const group = document.createElement('div');
+            group.className = 'couple-group';
+            
+            let html = renderPerson(m);
+            if(m.spouses) {
+                m.spouses.forEach(s => {
+                    html += `<div class="spouse-connector"></div>`;
+                    if(s.marriage) html += `<div class="marriage-label">${s.marriage}</div><div class="spouse-connector"></div>`;
+                    html += renderPerson(s);
+                });
             }
-            coupleDiv.innerHTML = html;
-            li.appendChild(coupleDiv);
-            if (member.children && member.children.length > 0) {
-                li.appendChild(createTree(member.children));
+            group.innerHTML = html;
+            li.appendChild(group);
+
+            let children = m.children || [];
+            if(m.spouses) m.spouses.forEach(s => { if(s.children) children = [...children, ...s.children]; });
+
+            if(children.length > 0) {
+                group.querySelector('img').onclick = (e) => { e.stopPropagation(); li.classList.toggle('collapsed'); };
+                li.appendChild(createTree(children));
             }
             ul.appendChild(li);
         });
         return ul;
     }
 
-    function initTree() {
-        fetch('familyData.json')
-            .then(res => res.json())
-            .then(data => {
-                wrapper.appendChild(createTree(data));
-                viewport.call(zoom);
-                resetView();
-                setTimeout(() => wrapper.classList.add('ready'), 200);
-            })
-            .catch(err => alert("Error: Use a local server (like Live Server) to load data."));
+    function switchView(type) {
+        document.getElementById('viewport').classList.add('hidden');
+        document.getElementById('timeline-wrapper').classList.add('hidden');
+        document.getElementById('gallery-wrapper').classList.add('hidden');
+        document.getElementById('viewToggle').innerText = type.toUpperCase() + " VIEW ▼";
+        if(type === 'tree') document.getElementById('viewport').classList.remove('hidden');
+        if(type === 'timeline') buildTimeline();
+        if(type === 'gallery') buildGallery();
     }
 
-    // --- 4. UI FUNCTIONS ---
-    function toggleBranch(img) { img.closest('li').classList.toggle('collapsed'); }
+    function buildTimeline() {
+        const t = document.getElementById('timeline-wrapper');
+        t.classList.remove('hidden');
+        t.innerHTML = "<h2 style='text-align:center'>Chronological History</h2>";
+        let list = [];
+        const flat = (arr) => arr.forEach(p => { 
+            list.push(p); 
+            if(p.spouses) p.spouses.forEach(s => { list.push(s); if(s.children) flat(s.children); });
+            if(p.children) flat(p.children);
+        });
+        flat(globalData);
+        const unique = Array.from(new Map(list.map(p => [p.name, p])).values());
+        unique.sort((a,b) => (parseInt(a.born)||0) - (parseInt(b.born)||0));
 
-    function showDetails(person) {
-        document.getElementById('side-img').src = person.img;
-        document.getElementById('side-name').innerText = person.name;
-        document.getElementById('side-born').innerText = person.born || "Unknown";
-        document.getElementById('side-died').innerText = person.died || "Living";
-        document.getElementById('side-job').innerText = person.job || "N/A";
-        document.getElementById('side-bio').innerText = person.bio || "No biography available.";
+        unique.forEach(p => {
+            t.innerHTML += `<div class="timeline-item" style="border-left-color:${p.gender==='male'?'var(--male-color)':'var(--female-color)'}">
+                <div style="font-weight:bold; min-width:60px;">${p.born||'????'}</div>
+                <img src="${p.img}" style="width:40px;height:40px;border-radius:50%" onerror="this.src='https://via.placeholder.com/40'">
+                <div><strong>${p.name}</strong><br><small>${p.job||''}</small></div>
+            </div>`;
+        });
+    }
+
+    function buildGallery() {
+        const g = document.getElementById('gallery-wrapper');
+        const content = document.getElementById('gallery-content');
+        g.classList.remove('hidden');
+        content.innerHTML = "";
+        let list = [];
+        const flat = (arr) => arr.forEach(p => { 
+            list.push(p); 
+            if(p.spouses) p.spouses.forEach(s => { list.push(s); if(s.children) flat(s.children); });
+            if(p.children) flat(p.children);
+        });
+        flat(globalData);
+        Array.from(new Map(list.map(p => [p.name, p])).values()).forEach(p => {
+            content.innerHTML += `<div class="gallery-item" onclick='showDetails(${JSON.stringify(p).replace(/"/g, "&quot;")})'><img src="${p.img}" onerror="this.src='https://via.placeholder.com/150'"><div>${p.name}</div></div>`;
+        });
+    }
+
+    function showDetails(p) {
+        document.getElementById('side-img').src = p.img;
+        document.getElementById('side-name').innerText = p.name;
+        document.getElementById('side-meta').innerText = `Born: ${p.born || 'Unknown'} | ${p.job || ''}`;
+        document.getElementById('side-bio').innerText = p.bio || "No biography available.";
         document.getElementById('sidebar').classList.add('open');
     }
 
     function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); }
-
-    function resetView() {
-        viewport.transition().duration(800).call(zoom.transform, d3.zoomIdentity.translate(window.innerWidth / 2 - 100, 100).scale(1));
-    }
-
-    function searchPerson() {
-        const query = document.getElementById('searchInput').value.replace(/\s+/g, '-').toLowerCase();
-        const target = document.getElementById("node-" + query);
-        if (target) {
-            document.querySelectorAll('.person-card').forEach(p => p.classList.remove('highlight'));
-            let p = target.parentElement;
-            while (p && p !== wrapper) { if (p.tagName === 'LI') p.classList.remove('collapsed'); p = p.parentElement; }
-            target.classList.add('highlight');
-            const b = target.getBoundingClientRect();
-            const vb = document.getElementById('viewport').getBoundingClientRect();
-            const x = (vb.width / 2) - (b.left + b.width / 2);
-            const y = (vb.height / 2) - (b.top + b.height / 2);
-            viewport.transition().duration(800).call(zoom.transform, d3.zoomIdentity.translate(x, y).scale(1.2));
-        }
-    }
-
-    function filterTree(type) {
-        document.querySelectorAll('.person-card').forEach(card => {
-            const data = JSON.parse(card.getAttribute('data-person'));
-            const isDeceased = data.died && data.died !== "Living";
-            card.style.opacity = "1"; card.style.filter = "none";
-            if (type === 'living' && isDeceased) { card.style.opacity = "0.2"; card.style.filter = "grayscale(1)"; }
-            else if (type === 'deceased' && !isDeceased) { card.style.opacity = "0.2"; card.style.filter = "grayscale(1)"; }
-        });
-    }
-
-    function exportTree() {
-        const originalTransform = wrapper.style.transform;
-        wrapper.style.transform = "scale(1)";
-        html2canvas(wrapper, { useCORS: true, backgroundColor: "#f0f2f5" }).then(canvas => {
-            wrapper.style.transform = originalTransform;
-            const link = document.createElement('a');
-            link.download = 'family-tree.png';
-            link.href = canvas.toDataURL();
-            link.click();
-        });
-    }
+    function resetView() { viewport.transition().duration(800).call(zoom.transform, d3.zoomIdentity.translate(window.innerWidth/2-100, 50).scale(1)); }
+    function exportTree() { html2canvas(wrapper, {useCORS: true}).then(c => { const l = document.createElement('a'); l.download='family-tree.png'; l.href=c.toDataURL(); l.click(); }); }
 </script>
-
 </body>
 </html>
-
