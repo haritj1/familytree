@@ -1,11 +1,46 @@
 [
-    { "id": "1", "name": "Grandpa Joe", "gender": "male", "isAlive": false, "img": "", "spouses": ["2"], "parents": [], "children": ["3", "4"] },
-    { "id": "2", "name": "Grandma Josephine", "gender": "female", "isAlive": false, "img": "", "spouses": ["1"], "parents": [], "children": ["3", "4"] },
-    { "id": "3", "name": "Uncle Charlie", "gender": "male", "isAlive": true, "img": "", "spouses": [], "parents": ["1", "2"], "children": [] },
-    { "id": "4", "name": "Mom", "gender": "female", "isAlive": true, "img": "", "spouses": ["5"], "parents": ["1", "2"], "children": ["6", "7"] },
-    { "id": "5", "name": "Dad", "gender": "male", "isAlive": true, "img": "", "spouses": ["4"], "parents": ["8", "9"], "children": ["6", "7"] },
-    { "id": "6", "name": "Me", "gender": "male", "isAlive": true, "img": "", "spouses": [], "parents": ["4", "5"], "children": [] },
-    { "id": "7", "name": "Sister", "gender": "female", "isAlive": true, "img": "", "spouses": [], "parents": ["4", "5"], "children": [] },
-    { "id": "8", "name": "Dad's Father", "gender": "male", "isAlive": false, "img": "", "spouses": ["9"], "parents": [], "children": ["5"] },
-    { "id": "9", "name": "Dad's Mother", "gender": "female", "isAlive": false, "img": "", "spouses": ["8"], "parents": [], "children": ["5"] }
+  { "id": "1", "name": "Laxmana Chetty", "gender": "male", "isAlive": false, "img": "", "spouses": ["2"], "parents": [], "children": ["3"] },
+  { "id": "2", "name": "Laxmi Ammal", "gender": "female", "isAlive": false, "img": "", "spouses": ["1"], "parents": [], "children": ["3"] },
+  
+  { "id": "3", "name": "Veerasamy", "gender": "male", "isAlive": false, "img": "", "spouses": ["4"], "parents": ["1", "2"], "children": ["5", "6", "7", "8", "9"] },
+  { "id": "4", "name": "Ellammal", "gender": "female", "isAlive": false, "img": "", "spouses": ["3"], "parents": [], "children": ["5", "6", "7", "8", "9"] },
+  
+  { "id": "5", "name": "Veerasamy's Daughter 1", "gender": "female", "isAlive": false, "img": "", "spouses": [], "parents": ["3", "4"], "children": [] },
+  { "id": "6", "name": "Veerasamy's Daughter 2", "gender": "female", "isAlive": false, "img": "", "spouses": [], "parents": ["3", "4"], "children": [] },
+  { "id": "7", "name": "Govindasamy", "gender": "male", "isAlive": false, "img": "", "spouses": [], "parents": ["3", "4"], "children": [] },
+  { "id": "8", "name": "Munusamy", "gender": "male", "isAlive": false, "img": "", "spouses": [], "parents": ["3", "4"], "children": [] },
+  { "id": "9", "name": "Ayyasamy", "gender": "male", "isAlive": false, "img": "", "spouses": ["10"], "parents": ["3", "4"], "children": ["11", "12"] },
+  { "id": "10", "name": "Sengammal", "gender": "female", "isAlive": false, "img": "", "spouses": ["9"], "parents": [], "children": ["11", "12"] },
+  
+  { "id": "11", "name": "Parthasarathy", "gender": "male", "isAlive": false, "img": "", "spouses": ["13"], "parents": ["9", "10"], "children": ["14", "15", "16", "17", "18", "20"] },
+  { "id": "12", "name": "Devaraj", "gender": "male", "isAlive": false, "img": "", "spouses": [], "parents": ["9", "10"], "children": [] },
+  { "id": "13", "name": "Ammani Ammal", "gender": "female", "isAlive": false, "img": "", "spouses": ["11"], "parents": [], "children": ["14", "15", "16", "17", "18", "20"] },
+  
+  { "id": "14", "name": "Adhikesavulu", "gender": "male", "isAlive": false, "img": "", "spouses": [], "parents": ["11", "13"], "children": [] },
+  { "id": "15", "name": "Kothandam", "gender": "male", "isAlive": false, "img": "", "spouses": [], "parents": ["11", "13"], "children": [] },
+  { "id": "16", "name": "Balaraman", "gender": "male", "isAlive": false, "img": "", "spouses": [], "parents": ["11", "13"], "children": [] },
+  { "id": "17", "name": "Thayarammal", "gender": "female", "isAlive": false, "img": "", "spouses": [], "parents": ["11", "13"], "children": [] },
+  { "id": "18", "name": "Muthukrishnan", "gender": "male", "isAlive": false, "img": "", "spouses": ["19"], "parents": ["11", "13"], "children": ["22", "23", "24", "25", "27", "28", "29"] },
+  { "id": "19", "name": "Ranganayagi", "gender": "female", "isAlive": false, "img": "", "spouses": ["18"], "parents": [], "children": ["22", "23", "24", "25", "27", "28", "29"] },
+  { "id": "20", "name": "Ramasamy", "gender": "male", "isAlive": false, "img": "", "spouses": ["21"], "parents": ["11", "13"], "children": [] },
+  { "id": "21", "name": "Laxmi", "gender": "female", "isAlive": false, "img": "", "spouses": ["20"], "parents": [], "children": [] },
+  
+  { "id": "22", "name": "Male1", "gender": "male", "isAlive": false, "img": "", "spouses": [], "parents": ["18", "19"], "children": [] },
+  { "id": "23", "name": "Female2", "gender": "female", "isAlive": false, "img": "", "spouses": [], "parents": ["18", "19"], "children": [] },
+  { "id": "24", "name": "Male3", "gender": "male", "isAlive": false, "img": "", "spouses": [], "parents": ["18", "19"], "children": [] },
+  { "id": "25", "name": "Loganathan", "gender": "male", "isAlive": true, "img": "", "spouses": ["26"], "parents": ["18", "19"], "children": ["30", "31", "32", "33", "34", "35", "36", "37", "38"] },
+  { "id": "26", "name": "Savithiri", "gender": "female", "isAlive": true, "img": "", "spouses": ["25"], "parents": [], "children": ["30", "31", "32", "33", "34", "35", "36", "37", "38"] },
+  { "id": "27", "name": "Narasimmalu", "gender": "male", "isAlive": false, "img": "", "spouses": [], "parents": ["18", "19"], "children": [] },
+  { "id": "28", "name": "Devagi", "gender": "female", "isAlive": false, "img": "", "spouses": [], "parents": ["18", "19"], "children": [] },
+  { "id": "29", "name": "Sulochana", "gender": "female", "isAlive": false, "img": "", "spouses": [], "parents": ["18", "19"], "children": [] },
+
+  { "id": "30", "name": "Loganathan's Child 1", "gender": "male", "isAlive": true, "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
+  { "id": "31", "name": "Loganathan's Child 2", "gender": "female", "isAlive": true, "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
+  { "id": "32", "name": "Loganathan's Child 3", "gender": "male", "isAlive": true, "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
+  { "id": "33", "name": "Loganathan's Child 4", "gender": "female", "isAlive": true, "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
+  { "id": "34", "name": "Loganathan's Child 5", "gender": "male", "isAlive": true, "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
+  { "id": "35", "name": "Loganathan's Child 6", "gender": "female", "isAlive": true, "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
+  { "id": "36", "name": "Loganathan's Child 7", "gender": "male", "isAlive": true, "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
+  { "id": "37", "name": "Loganathan's Child 8", "gender": "female", "isAlive": true, "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
+  { "id": "38", "name": "Loganathan's Child 9", "gender": "male", "isAlive": true, "img": "", "spouses": [], "parents": ["25", "26"], "children": [] }
 ]
