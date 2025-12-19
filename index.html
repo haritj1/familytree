@@ -48,7 +48,7 @@
             align-items: center;
         }
 
-        input[type="text"], input[type="file"] {
+        input[type="text"] {
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -118,6 +118,20 @@
         }
         
         .deceased { filter: grayscale(100%); opacity: 0.9; }
+
+        /* Card Content & Bounce Animation */
+        .card-content {
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .person-group:hover .card-content {
+            transform: translateY(-8px);
+        }
+        .person-group.has-children {
+            cursor: pointer;
+        }
+        .person-group.collapsed rect {
+            stroke-dasharray: 5,5; /* Visual hint for collapsed state */
+        }
         
         /* Tooltip */
         .tooltip {
@@ -159,16 +173,12 @@
             <button class="secondary" onclick="resetView()">Reset View</button>
         </div>
 
-        <div style="margin-top:10px; border-top:1px solid #eee; padding-top:10px;">
-            <small>Load external data:</small>
-            <input type="file" id="fileInput" accept=".json" onchange="loadUserFile(this)">
-        </div>
-
         <div id="legend">
             <div class="legend-item"><div class="dot" style="background:var(--male-color); border:1px solid var(--male-border);"></div> Male</div>
             <div class="legend-item"><div class="dot" style="background:var(--female-color); border:1px solid var(--female-border);"></div> Female</div>
             <div class="legend-item"><div class="dot" style="border:2px solid var(--living-status);"></div> Living (Green Border)</div>
             <div class="legend-item"><div class="dot" style="border:2px solid var(--deceased-status);"></div> Deceased (Grey Border)</div>
+            <div class="legend-item" style="margin-top:5px; font-style: italic; font-size: 0.8em;">* Click card to expand/collapse</div>
         </div>
     </div>
 
@@ -189,7 +199,7 @@
         let svg, g, zoom;
         let rootData;
 
-        // --- 2. SAMPLE DATA (Updated with requested Family Lineage) ---
+        // --- 2. SAMPLE DATA ---
         const sampleData = {
           "name": "Laxmana chetty",
           "gender": "male",
@@ -384,64 +394,41 @@
 
             g = svg.append("g").attr("transform", "translate(40,40)");
             
-            // Set up zoom behavior reference for reset
+            // Set up zoom behavior reference
             zoom = d3.zoom().on("zoom", (e) => g.attr("transform", e.transform));
             svg.call(zoom);
         }
 
-        function loadUserFile(input) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    drawTree(data);
-                } catch (error) {
-                    alert("Invalid JSON file");
-                }
-            };
-            reader.readAsText(file);
-        }
-
         // --- 4. DRAWING LOGIC ---
-        function drawTree(data) {
+        function drawTree(data, isUpdate = false) {
             rootData = data;
-            g.selectAll("*").remove(); // Clear previous tree
+            g.selectAll("*").remove(); // Clear previous tree for redraw
 
             // Create hierarchy
             const root = d3.hierarchy(data);
 
             // Create tree layout
-            // We increase node size to account for spouses
             const treeLayout = d3.tree().nodeSize([config.nodeWidth + config.spouseGap, config.levelGap]);
-            
             treeLayout(root);
 
-            // Center the tree initially
-            const containerWidth = document.getElementById("tree-container").clientWidth;
-            const initialX = containerWidth / 2 - root.x;
-            const initialY = 100;
-            
-            svg.call(zoom.transform, d3.zoomIdentity.translate(initialX, initialY).scale(0.8));
+            // Handle initial zoom centering
+            if (!isUpdate) {
+                const containerWidth = document.getElementById("tree-container").clientWidth;
+                const initialX = containerWidth / 2 - root.x;
+                const initialY = 100;
+                svg.call(zoom.transform, d3.zoomIdentity.translate(initialX, initialY).scale(0.8));
+            }
 
             // --- LINKS (Connectors) ---
-            
-            // 1. Parent to Child links
             g.selectAll(".link")
                 .data(root.links())
                 .enter().append("path")
                 .attr("class", "link")
                 .attr("d", d => {
-                    // Logic: Link starts from bottom center of Parent (or parent+spouse group center)
-                    // and goes to top center of Child
-                    
-                    // If parent has a spouse, the connection point is between them
                     const parentX = d.source.data.spouse ? d.source.x + (config.spouseGap/2) : d.source.x;
-                    const parentY = d.source.y + config.nodeHeight / 2; // Bottom of node
-
+                    const parentY = d.source.y + config.nodeHeight / 2;
                     const childX = d.target.x;
-                    const childY = d.target.y - config.nodeHeight / 2; // Top of node
+                    const childY = d.target.y - config.nodeHeight / 2;
 
                     return `M${parentX},${parentY} 
                             C${parentX},${(parentY + childY) / 2} 
@@ -463,10 +450,26 @@
                 const group = selection.append("g")
                     .attr("transform", `translate(${offsetX}, ${offsetY})`)
                     .attr("class", "person-group")
-                    .attr("data-name", personData.name.toLowerCase())
-                    .style("cursor", "pointer");
+                    .attr("data-name", personData.name.toLowerCase());
 
-                // --- TOOLTIP INTERACTION ---
+                // --- 1. CLICK TO TOGGLE CHILDREN (COLLAPSE/EXPAND) ---
+                // Only enable for non-spouses (main lineage nodes) that have children (or hidden children)
+                const hasChildren = personData.children || personData._children;
+                if (!isSpouse && hasChildren) {
+                    group.classed("has-children", true);
+                    if (personData._children) group.classed("collapsed", true);
+                    
+                    group.on("click", function(event) {
+                        event.stopPropagation(); // Prevent drag/zoom triggers if any
+                        toggleChildren(personData);
+                    });
+                }
+
+                // --- 2. BOUNCE & HOVER GROUP WRAPPER ---
+                // We wrap content in 'card-content' to animate it without messing up D3 coordinates
+                const contentGroup = group.append("g").attr("class", "card-content");
+
+                // --- 3. TOOLTIP ---
                 const tooltip = d3.select("#tooltip");
                 group.on("mouseover", function(event) {
                     tooltip.transition().duration(200).style("opacity", 1);
@@ -474,22 +477,17 @@
                     let tooltipHtml = `<strong>${personData.name}</strong>`;
                     tooltipHtml += `Gender: ${personData.gender}<br/>`;
                     tooltipHtml += `Status: ${personData.status}<br/>`;
-                    if (personData.spouse) {
-                        tooltipHtml += `Spouse: ${personData.spouse.name}<br/>`;
+                    if (personData.spouse) tooltipHtml += `Spouse: ${personData.spouse.name}<br/>`;
+                    if (personData.children || personData._children) {
+                         const count = (personData.children || []).length + (personData._children || []).length;
+                         if (count > 0) tooltipHtml += `Children: ${count}<br/>`;
                     }
-                    if (personData.parents && personData.parents.length > 0) {
-                         tooltipHtml += `Parents: ${personData.parents.map(p => p.name).join(", ")}<br/>`;
-                    }
-                    if (personData.children && personData.children.length > 0) {
-                        tooltipHtml += `Children: ${personData.children.length}`;
-                    }
+                    if (personData._children) tooltipHtml += `<em>(Click to Expand)</em>`;
+                    else if (personData.children) tooltipHtml += `<em>(Click to Collapse)</em>`;
 
                     tooltip.html(tooltipHtml)
                         .style("left", (event.pageX + 15) + "px")
                         .style("top", (event.pageY - 28) + "px");
-                    
-                    // Highlight on hover
-                    d3.select(this).select("rect").style("filter", "brightness(0.95)");
                 })
                 .on("mousemove", function(event) {
                      tooltip.style("left", (event.pageX + 15) + "px")
@@ -497,7 +495,6 @@
                 })
                 .on("mouseout", function() {
                     tooltip.transition().duration(500).style("opacity", 0);
-                    d3.select(this).select("rect").style("filter", null);
                 });
 
 
@@ -506,20 +503,17 @@
                 const statusColor = personData.status === 'living' ? 'var(--living-status)' : 'var(--deceased-status)';
 
                 // Box
-                group.append("rect")
+                contentGroup.append("rect")
                     .attr("width", config.nodeWidth)
                     .attr("height", config.nodeHeight)
                     .attr("x", -config.nodeWidth / 2)
                     .attr("y", -config.nodeHeight / 2)
                     .attr("rx", 10)
                     .attr("fill", color)
-                    .attr("stroke", statusColor) // Status indicates border color
+                    .attr("stroke", statusColor)
                     .attr("stroke-width", 3);
 
-                // --- IMAGE LOADING LOGIC ---
-                // If it's a full URL (http), use it. 
-                // If it's a filename, assume it's in images/ folder.
-                // If missing, use default icon.
+                // Image logic
                 let imgSrc;
                 const defaultMale = "https://cdn-icons-png.flaticon.com/512/4128/4128176.png";
                 const defaultFemale = "https://cdn-icons-png.flaticon.com/512/4128/4128249.png";
@@ -530,34 +524,54 @@
                     imgSrc = personData.gender === 'male' ? defaultMale : defaultFemale;
                 }
 
-                group.append("image")
+                contentGroup.append("image")
                     .attr("href", imgSrc)
                     .attr("width", config.imageSize)
                     .attr("height", config.imageSize)
                     .attr("x", -config.nodeWidth / 2 + 10)
                     .attr("y", -config.imageSize / 2)
-                    .attr("preserveAspectRatio", "xMidYMid slice"); // Ensure image fits well
+                    .attr("preserveAspectRatio", "xMidYMid slice");
 
                 // Name
-                group.append("text")
+                contentGroup.append("text")
                     .attr("dy", "5")
-                    .attr("x", 15) // Shift text right due to image
+                    .attr("x", 15)
                     .style("font-weight", "bold")
                     .text(personData.name.length > 15 ? personData.name.substring(0,12)+"..." : personData.name);
 
-                // Visual indicator for Deceased
+                // Deceased filter
                 if (personData.status === 'deceased') {
-                    group.style("filter", "grayscale(0.5)");
+                    contentGroup.style("filter", "grayscale(0.5)");
+                }
+                
+                // --- Collapse Indicator (Plus/Minus sign) ---
+                if (!isSpouse && hasChildren) {
+                    const indicatorColor = personData._children ? "#4caf50" : "#f44336"; // Green for expand, Red for collapse
+                    const sign = personData._children ? "+" : "-";
+                    
+                    const indGroup = contentGroup.append("g")
+                        .attr("transform", `translate(${config.nodeWidth/2 - 15}, ${config.nodeHeight/2 - 15})`);
+                    
+                    indGroup.append("circle")
+                        .attr("r", 8)
+                        .attr("fill", "white")
+                        .attr("stroke", indicatorColor);
+                        
+                    indGroup.append("text")
+                        .attr("dy", 4)
+                        .attr("text-anchor", "middle")
+                        .style("font-size", "12px")
+                        .style("font-weight", "bold")
+                        .style("fill", indicatorColor)
+                        .text(sign);
                 }
 
-                // --- SPOUSE PARENTS (The difficult requirement) ---
+                // --- SPOUSE PARENTS ---
                 if (isSpouse && personData.parents && personData.parents.length > 0) {
-                    const parentGap = 10;
                     const pWidth = 60; 
                     const pHeight = 30;
                     
-                    // Draw line up from spouse
-                    group.append("line")
+                    contentGroup.append("line")
                         .attr("x1", 0).attr("y1", -config.nodeHeight/2)
                         .attr("x2", 0).attr("y2", -config.nodeHeight/2 - 20)
                         .attr("stroke", "#999");
@@ -566,10 +580,9 @@
                         const pX = (i === 0 ? -1 : 1) * (pWidth/2 + 5);
                         const pY = -config.nodeHeight/2 - 40;
 
-                        const pGroup = group.append("g")
+                        const pGroup = contentGroup.append("g")
                             .attr("transform", `translate(${pX}, ${pY})`);
 
-                        // Parent Box
                         pGroup.append("rect")
                             .attr("width", pWidth)
                             .attr("height", pHeight)
@@ -578,19 +591,17 @@
                             .attr("fill", parent.gender === 'male' ? '#e3f2fd' : '#fce4ec')
                             .attr("stroke", "#ccc");
                         
-                        // Parent Name
                         pGroup.append("text")
                             .attr("dy", "4")
                             .style("font-size", "8px")
-                            .text(parent.name.split(' ')[0]); // Just first name to save space
+                            .text(parent.name.split(' ')[0]);
 
-                        // Connector to central line
-                        group.append("line")
+                        contentGroup.append("line")
                             .attr("x1", 0).attr("y1", -config.nodeHeight/2 - 20)
                             .attr("x2", pX).attr("y2", -config.nodeHeight/2 - 20)
                             .attr("stroke", "#999");
                         
-                        group.append("line")
+                        contentGroup.append("line")
                             .attr("x1", pX).attr("y1", -config.nodeHeight/2 - 20)
                             .attr("x2", pX).attr("y2", pY + pHeight/2)
                             .attr("stroke", "#999");
@@ -604,7 +615,6 @@
                 
                 // 2. Render Spouse if exists
                 if (d.data.spouse) {
-                    // Draw connector line between spouses
                     d3.select(this).append("line")
                         .attr("x1", config.nodeWidth/2)
                         .attr("y1", 0)
@@ -612,12 +622,24 @@
                         .attr("y2", 0)
                         .attr("stroke", "#ff4081")
                         .attr("stroke-width", 2)
-                        .attr("stroke-dasharray", "5,5"); // Dashed line for marriage
+                        .attr("stroke-dasharray", "5,5");
 
-                    // Render Spouse
                     renderPerson(d3.select(this), config.spouseGap, 0, d.data.spouse, true);
                 }
             });
+        }
+        
+        // Function to toggle children
+        function toggleChildren(d) {
+            if (d.children) {
+                d._children = d.children;
+                d.children = null;
+            } else {
+                d.children = d._children;
+                d._children = null;
+            }
+            // Redraw with isUpdate = true to keep zoom
+            drawTree(rootData, true);
         }
 
         // --- 5. INTERACTION LOGIC ---
@@ -626,10 +648,8 @@
             const query = document.getElementById("searchInput").value.toLowerCase();
             if (!query) return;
 
-            // Reset previous highlights
             d3.selectAll(".person-group").classed("highlight", false);
 
-            // Find matching nodes
             const matches = d3.selectAll(".person-group").filter(function() {
                 return d3.select(this).attr("data-name").includes(query);
             });
@@ -639,25 +659,15 @@
                 return;
             }
 
-            // Highlight matches
             matches.classed("highlight", true);
-
-            // Zoom to first match
-            // We need to find the parent transform of the matched element to center it
-            // This is complex in SVG, so we'll just expand the view significantly
-            // or reset to center if complex.
-            // Simple visual highlight is often enough for this scope.
         }
 
         function resetView() {
             document.getElementById("searchInput").value = "";
             d3.selectAll(".person-group").classed("highlight", false);
             
-            // Animate back to initial state
+            // Expand all logic could go here, but simplest reset is just view reset
             const containerWidth = document.getElementById("tree-container").clientWidth;
-            const root = d3.hierarchy(rootData); 
-            // We re-calculate root just to get X coordinate for centering, 
-            // though in a real app we'd cache the initial transform.
             
             svg.transition().duration(750).call(
                 zoom.transform, 
