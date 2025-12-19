@@ -24,6 +24,63 @@
             background-color: var(--bg-color);
         }
 
+        /* --- LOGIN OVERLAY --- */
+        #login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .login-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 300px;
+        }
+
+        .login-box h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 10px;
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .login-box button:hover {
+            background: #1976d2;
+        }
+
+        /* Hide main content initially */
+        #controls, #tree-container, #legend {
+            display: none;
+        }
+
         /* Controls Bar */
         #controls {
             position: absolute;
@@ -34,7 +91,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             z-index: 100;
-            display: flex;
+            /* display: flex;  Set via JS after login */
             flex-direction: column;
             gap: 10px;
             max-width: 300px;
@@ -175,13 +232,14 @@
                 background-color: white; 
                 -webkit-print-color-adjust: exact;
             }
-            #controls, #tooltip { 
+            #controls, #tooltip, #login-overlay { 
                 display: none !important; 
             }
             #tree-container {
                 width: 100%;
                 height: 100%;
                 border: none;
+                display: block !important;
             }
             svg {
                 height: 100vh;
@@ -192,6 +250,16 @@
     </style>
 </head>
 <body>
+
+    <!-- LOGIN OVERLAY -->
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2>Secured Family Tree</h2>
+            <p>Please enter the password to view.</p>
+            <input type="password" id="passwordInput" placeholder="Password">
+            <button onclick="checkPassword()">Unlock</button>
+        </div>
+    </div>
 
     <div id="controls">
         <h2>Family Tree Controls</h2>
@@ -556,6 +624,36 @@
 
         // --- 3. INITIALIZATION ---
         window.onload = function() {
+            // Focus password input on load
+            document.getElementById('passwordInput').focus();
+
+            // Add Enter key listener for password submit
+            document.getElementById("passwordInput").addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    checkPassword();
+                }
+            });
+        };
+
+        // --- PASSWORD PROTECTION ---
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            // Simple visual gate - Password is '1234'
+            if (password === 'TRLFamily1$') {
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('controls').style.display = 'flex';
+                document.getElementById('tree-container').style.display = 'block';
+                startApp();
+            } else {
+                // Incorrect password action: Clear body and attempt close
+                document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#2c3e50;color:white;font-family:sans-serif;"><h1>Access Denied</h1></div>';
+                // Attempt to close window (often blocked by browsers if not opened by script)
+                window.close();
+            }
+        }
+
+        // --- APP STARTUP (After Login) ---
+        function startApp() {
             initTree();
 
             // Add Enter key listener for search
@@ -576,7 +674,7 @@
                     console.log("Using sample data (Local fetch blocked or file missing).");
                     drawTree(sampleData);
                 });
-        };
+        }
 
         function initTree() {
             const container = document.getElementById("tree-container");
