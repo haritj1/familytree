@@ -202,9 +202,9 @@
             nodeWidth: 160,
             nodeHeight: 80,
             imageSize: 40,
-            siblingGap: 240,
-            levelGap: 300,
-            spouseGap: 220 // Distance between husband and wife
+            siblingGap: 40, // Reduced from 240 (unused) to 40 (now used for buffer)
+            levelGap: 200,  // Reduced from 300
+            spouseGap: 200  // Reduced from 220
         };
 
         let svg, g, zoom;
@@ -506,7 +506,8 @@
             }
 
             // Create tree layout
-            const treeLayout = d3.tree().nodeSize([config.nodeWidth + config.spouseGap, config.levelGap]);
+            // Updated to include siblingGap in the x-dimension calculation
+            const treeLayout = d3.tree().nodeSize([config.nodeWidth + config.spouseGap + config.siblingGap, config.levelGap]);
             treeLayout(root);
 
             // Handle initial zoom centering
