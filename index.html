@@ -77,17 +77,6 @@
         button.secondary:hover { background-color: #455a64; }
         button.action-btn { font-size: 0.9em; padding: 6px 10px; }
 
-        /* Legend */
-        #legend {
-            margin-top: 10px;
-            font-size: 0.85rem;
-            color: #666;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
-        }
-        .legend-item { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; }
-
         /* SVG Styles */
         #tree-container {
             width: 100vw;
@@ -110,7 +99,7 @@
         }
 
         .node image {
-            clip-path: circle(40%);
+            /* clip-path: circle(40%); Removed to show square images */
         }
 
         .link {
@@ -223,14 +212,6 @@
         
         <div class="control-group">
             <button class="secondary" onclick="printView()">Print / Save PDF</button>
-        </div>
-
-        <div id="legend">
-            <div class="legend-item"><div class="dot" style="background:var(--male-color); border:1px solid var(--male-border);"></div> Male</div>
-            <div class="legend-item"><div class="dot" style="background:var(--female-color); border:1px solid var(--female-border);"></div> Female</div>
-            <div class="legend-item"><div class="dot" style="border:2px solid var(--living-status);"></div> Living (Green Border)</div>
-            <div class="legend-item"><div class="dot" style="border:2px solid var(--deceased-status);"></div> Deceased (Grey Border)</div>
-            <div class="legend-item" style="margin-top:5px; font-style: italic; font-size: 0.8em;">* Click card to expand/collapse</div>
         </div>
     </div>
 
