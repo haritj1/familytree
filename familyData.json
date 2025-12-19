@@ -1,25 +1,57 @@
 {
-  "nodes": [
-    { "data": { "id": "u1", "name": "Gen 1: The Great-Grandparents" }},
-    { "data": { "id": "g1_p1", "name": "Arthur Pendragon", "gender": "male", "parent": "u1", "born": "1900", "img": "images/g1p1.jpg", "bio": "The family patriarch." }},
-    { "data": { "id": "g1_p2", "name": "Guinevere Du Lac", "gender": "female", "parent": "u1", "born": "1905", "img": "images/g1p2.jpg", "bio": "The family matriarch." }},
-
-    { "data": { "id": "u2", "name": "Gen 2: The Grandparents" }},
-    { "data": { "id": "g2_p1", "name": "Lance Du Lac", "gender": "male", "parent": "u2", "born": "1930", "img": "images/g2p1.jpg" }},
-    { "data": { "id": "g2_p2", "name": "Elaine Corbenic", "gender": "female", "parent": "u2", "born": "1935", "img": "images/g2p2.jpg" }},
-
-    { "data": { "id": "u3", "name": "Gen 3: The Parents" }},
-    { "data": { "id": "g3_p1", "name": "Galahad Du Lac", "gender": "male", "parent": "u3", "born": "1960", "img": "images/g3p1.jpg" }},
-    { "data": { "id": "g3_p2", "name": "Percival De Galis", "gender": "female", "parent": "u3", "born": "1962", "img": "images/g3p2.jpg" }},
-
-    { "data": { "id": "u4", "name": "Gen 4: The Children" }},
-    { "data": { "id": "g4_p1", "name": "Bors De Ganis", "gender": "male", "parent": "u4", "born": "1990", "img": "images/g4p1.jpg" }},
-    { "data": { "id": "g4_p2", "name": "Dindrane De Galis", "gender": "female", "parent": "u4", "born": "1992", "img": "images/g4p2.jpg" }}
-  ],
-  "edges": [
-    { "data": { "source": "u1", "target": "g2_p1", "label": "Lineage" }},
-    { "data": { "source": "u2", "target": "g3_p1", "label": "Lineage" }},
-    { "data": { "source": "u3", "target": "g4_p1", "label": "Lineage" }},
-    { "data": { "source": "u3", "target": "g4_p2", "label": "Lineage" }}
+  "id": 1,
+  "name": "Grandpa John",
+  "gender": "M",
+  "spouse": "Grandma Mary",
+  "status": "deceased",
+  "born": "1940",
+  "died": "2015",
+  "img": "1.jpg",
+  "children": [
+    {
+      "id": 2,
+      "name": "Father Robert",
+      "gender": "M",
+      "spouse": "Mother Sarah",
+      "status": "living",
+      "born": "1970",
+      "img": "2.jpg",
+      "children": [
+        {
+          "id": 4,
+          "name": "Son Mike",
+          "gender": "M",
+          "status": "living",
+          "born": "1995",
+          "img": "4.jpg"
+        },
+        {
+          "id": 5,
+          "name": "Daughter Anna",
+          "gender": "F",
+          "status": "living",
+          "born": "1998",
+          "img": "5.jpg"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Aunt Jessica",
+      "gender": "F",
+      "spouse": "Uncle Tom",
+      "status": "living",
+      "born": "1975",
+      "img": "3.jpg",
+      "children": [
+          {
+              "id": 6,
+              "name": "Cousin Tim",
+              "gender": "M",
+              "status": "living",
+              "born": "2005"
+          }
+      ]
+    }
   ]
 }
