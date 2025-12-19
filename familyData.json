@@ -1,46 +1,106 @@
-[
-  { "id": "1", "name": "Laxmana Chetty", "gender": "male", "Status": "Deceased", "img": "", "spouses": ["2"], "parents": [], "children": ["3"] },
-  { "id": "2", "name": "Laxmi Ammal", "gender": "female", "Status": "Deceased", "img": "", "spouses": ["1"], "parents": [], "children": ["3"] },
-  
-  { "id": "3", "name": "Veerasamy", "gender": "male", "Status": "Deceased", "img": "", "spouses": ["4"], "parents": ["1", "2"], "children": ["5", "6", "7", "8", "9"] },
-  { "id": "4", "name": "Ellammal", "gender": "female", "Status": "Deceased", "img": "", "spouses": ["3"], "parents": [], "children": ["5", "6", "7", "8", "9"] },
-  
-  { "id": "5", "name": "Veerasamy's Daughter 1", "gender": "female", "Status": "Deceased", "img": "", "spouses": [], "parents": ["3", "4"], "children": [] },
-  { "id": "6", "name": "Veerasamy's Daughter 2", "gender": "female", "Status": "Deceased", "img": "", "spouses": [], "parents": ["3", "4"], "children": [] },
-  { "id": "7", "name": "Govindasamy", "gender": "male", "Status": "Deceased", "img": "", "spouses": [], "parents": ["3", "4"], "children": [] },
-  { "id": "8", "name": "Munusamy", "gender": "male", "Status": "Deceased", "img": "", "spouses": [], "parents": ["3", "4"], "children": [] },
-  { "id": "9", "name": "Ayyasamy", "gender": "male", "Status": "Deceased", "img": "", "spouses": ["10"], "parents": ["3", "4"], "children": ["11", "12"] },
-  { "id": "10", "name": "Sengammal", "gender": "female", "Status": "Deceased", "img": "", "spouses": ["9"], "parents": [], "children": ["11", "12"] },
-  
-  { "id": "11", "name": "Parthasarathy", "gender": "male", "Status": "Deceased", "img": "", "spouses": ["13"], "parents": ["9", "10"], "children": ["14", "15", "16", "17", "18", "20"] },
-  { "id": "12", "name": "Devaraj", "gender": "male", "Status": "Deceased", "img": "", "spouses": [], "parents": ["9", "10"], "children": [] },
-  { "id": "13", "name": "Ammani Ammal", "gender": "female", "Status": "Deceased", "img": "", "spouses": ["11"], "parents": [], "children": ["14", "15", "16", "17", "18", "20"] },
-  
-  { "id": "14", "name": "Adhikesavulu", "gender": "male", "Status": "Deceased", "img": "", "spouses": [], "parents": ["11", "13"], "children": [] },
-  { "id": "15", "name": "Kothandam", "gender": "male", "Status": "Deceased", "img": "", "spouses": [], "parents": ["11", "13"], "children": [] },
-  { "id": "16", "name": "Balaraman", "gender": "male", "Status": "Deceased", "img": "", "spouses": [], "parents": ["11", "13"], "children": [] },
-  { "id": "17", "name": "Thayarammal", "gender": "female", "Status": "Deceased", "img": "", "spouses": [], "parents": ["11", "13"], "children": [] },
-  { "id": "18", "name": "Muthukrishnan", "gender": "male", "Status": "Deceased", "img": "", "spouses": ["19"], "parents": ["11", "13"], "children": ["22", "23", "24", "25", "27", "28", "29"] },
-  { "id": "19", "name": "Ranganayagi", "gender": "female", "Status": "Deceased", "img": "", "spouses": ["18"], "parents": [], "children": ["22", "23", "24", "25", "27", "28", "29"] },
-  { "id": "20", "name": "Ramasamy", "gender": "male", "Status": "Deceased", "img": "", "spouses": ["21"], "parents": ["11", "13"], "children": [] },
-  { "id": "21", "name": "Laxmi", "gender": "female", "Status": "Deceased", "img": "", "spouses": ["20"], "parents": [], "children": [] },
-  
-  { "id": "22", "name": "Male1", "gender": "male", "Status": "Deceased", "img": "", "spouses": [], "parents": ["18", "19"], "children": [] },
-  { "id": "23", "name": "Female2", "gender": "female", "Status": "Deceased", "img": "", "spouses": [], "parents": ["18", "19"], "children": [] },
-  { "id": "24", "name": "Male3", "gender": "male", "Status": "Deceased", "img": "", "spouses": [], "parents": ["18", "19"], "children": [] },
-  { "id": "25", "name": "Loganathan", "gender": "male", "Status": "Living", "img": "", "spouses": ["26"], "parents": ["18", "19"], "children": ["30", "31", "32", "33", "34", "35", "36", "37", "38"] },
-  { "id": "26", "name": "Savithiri", "gender": "female", "Status": "Living", "img": "", "spouses": ["25"], "parents": [], "children": ["30", "31", "32", "33", "34", "35", "36", "37", "38"] },
-  { "id": "27", "name": "Narasimmalu", "gender": "male", "Status": "Deceased", "img": "", "spouses": [], "parents": ["18", "19"], "children": [] },
-  { "id": "28", "name": "Devagi", "gender": "female", "Status": "Deceased", "img": "", "spouses": [], "parents": ["18", "19"], "children": [] },
-  { "id": "29", "name": "Sulochana", "gender": "female", "Status": "Deceased", "img": "", "spouses": [], "parents": ["18", "19"], "children": [] },
-
-  { "id": "30", "name": "Loganathan's Child 1", "gender": "male", "Status": "Living", "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
-  { "id": "31", "name": "Loganathan's Child 2", "gender": "female", "Status": "Living", "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
-  { "id": "32", "name": "Loganathan's Child 3", "gender": "male", "Status": "Living", "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
-  { "id": "33", "name": "Loganathan's Child 4", "gender": "female", "Status": "Living", "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
-  { "id": "34", "name": "Loganathan's Child 5", "gender": "male", "Status": "Living", "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
-  { "id": "35", "name": "Loganathan's Child 6", "gender": "female", "Status": "Living", "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
-  { "id": "36", "name": "Loganathan's Child 7", "gender": "male", "Status": "Living", "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
-  { "id": "37", "name": "Loganathan's Child 8", "gender": "female", "Status": "Living", "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
-  { "id": "38", "name": "Loganathan's Child 9", "gender": "male", "Status": "Living", "img": "", "spouses": [], "parents": ["25", "26"], "children": [] }
-]
+{
+  "name": "Laxmana chetty",
+  "gender": "male",
+  "status": "deceased",
+  "spouse": {
+    "name": "Laxmi Ammal",
+    "gender": "female",
+    "status": "deceased"
+  },
+  "children": [
+    {
+      "name": "Veerasamy",
+      "gender": "male",
+      "status": "deceased",
+      "spouse": {
+        "name": "Ellammal",
+        "gender": "female",
+        "status": "deceased"
+      },
+      "children": [
+        { "name": "Daughter 1", "gender": "female", "status": "deceased" },
+        { "name": "Daughter 2", "gender": "female", "status": "deceased" },
+        { "name": "Govindasamy", "gender": "male", "status": "deceased" },
+        { "name": "Munusamy", "gender": "male", "status": "deceased" },
+        {
+          "name": "Ayyasamy",
+          "gender": "male",
+          "status": "deceased",
+          "spouse": {
+            "name": "Sengammal",
+            "gender": "female",
+            "status": "deceased"
+          },
+          "children": [
+            {
+              "name": "Parthasarathy",
+              "gender": "male",
+              "status": "deceased",
+              "spouse": {
+                "name": "Ammani Ammal",
+                "gender": "female",
+                "status": "deceased"
+              },
+              "children": [
+                { "name": "Adhikesavulu", "gender": "male", "status": "deceased" },
+                { "name": "Kothandam", "gender": "male", "status": "deceased" },
+                { "name": "Balaraman", "gender": "male", "status": "deceased" },
+                { "name": "Thayarammal", "gender": "female", "status": "deceased" },
+                {
+                  "name": "Muthukrishnan",
+                  "gender": "male",
+                  "status": "deceased",
+                  "spouse": {
+                    "name": "Ranganayagi",
+                    "gender": "female",
+                    "status": "deceased"
+                  },
+                  "children": [
+                    { "name": "Male1", "gender": "male", "status": "living" },
+                    { "name": "Female2", "gender": "female", "status": "living" },
+                    { "name": "Male3", "gender": "male", "status": "living" },
+                    {
+                      "name": "Loganathan",
+                      "gender": "male",
+                      "status": "living",
+                      "spouse": {
+                        "name": "Savithiri",
+                        "gender": "female",
+                        "status": "living"
+                      },
+                      "children": [
+                        { "name": "Child 1", "gender": "male", "status": "living" },
+                        { "name": "Child 2", "gender": "female", "status": "living" },
+                        { "name": "Child 3", "gender": "male", "status": "living" },
+                        { "name": "Child 4", "gender": "female", "status": "living" },
+                        { "name": "Child 5", "gender": "male", "status": "living" },
+                        { "name": "Child 6", "gender": "female", "status": "living" },
+                        { "name": "Child 7", "gender": "male", "status": "living" },
+                        { "name": "Child 8", "gender": "female", "status": "living" },
+                        { "name": "Child 9", "gender": "male", "status": "living" }
+                      ]
+                    },
+                    { "name": "Narasimmalu", "gender": "male", "status": "living" },
+                    { "name": "Devagi", "gender": "female", "status": "living" },
+                    { "name": "Sulochana", "gender": "female", "status": "living" }
+                  ]
+                },
+                {
+                  "name": "Ramasamy",
+                  "gender": "male",
+                  "status": "deceased",
+                  "spouse": {
+                    "name": "Laxmi",
+                    "gender": "female",
+                    "status": "deceased"
+                  }
+                }
+              ]
+            },
+            { "name": "Devaraj", "gender": "male", "status": "deceased" }
+          ]
+        }
+      ]
+    }
+  ]
+}
