@@ -47,6 +47,12 @@
             gap: 10px;
             align-items: center;
         }
+        
+        .button-row {
+            display: flex;
+            gap: 5px;
+            justify-content: space-between;
+        }
 
         input[type="text"] {
             padding: 8px;
@@ -63,11 +69,13 @@
             border-radius: 4px;
             cursor: pointer;
             transition: background 0.2s;
+            flex: 1;
         }
 
         button:hover { background-color: #1976d2; }
         button.secondary { background-color: #607d8b; }
         button.secondary:hover { background-color: #455a64; }
+        button.action-btn { font-size: 0.9em; padding: 6px 10px; }
 
         /* Legend */
         #legend {
@@ -168,6 +176,30 @@
             padding-bottom: 3px;
         }
 
+        /* Print Styles */
+        @media print {
+            @page {
+                size: landscape;
+                margin: 0;
+            }
+            body { 
+                background-color: white; 
+                -webkit-print-color-adjust: exact;
+            }
+            #controls, #tooltip { 
+                display: none !important; 
+            }
+            #tree-container {
+                width: 100%;
+                height: 100%;
+                border: none;
+            }
+            svg {
+                height: 100vh;
+                width: 100vw;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -179,9 +211,18 @@
             <input type="text" id="searchInput" placeholder="Search name...">
             <button onclick="searchNode()">Search</button>
         </div>
+        
+        <div class="button-row">
+            <button class="action-btn" onclick="expandAll()">Expand All</button>
+            <button class="action-btn" onclick="collapseAll()">Collapse All</button>
+        </div>
 
         <div class="control-group">
             <button class="secondary" onclick="resetView()">Reset View</button>
+        </div>
+        
+        <div class="control-group">
+            <button class="secondary" onclick="printView()">Print / Save PDF</button>
         </div>
 
         <div id="legend">
@@ -442,6 +483,14 @@
         // --- 3. INITIALIZATION ---
         window.onload = function() {
             initTree();
+
+            // Add Enter key listener for search
+            document.getElementById("searchInput").addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    searchNode();
+                }
+            });
+
             // Try to fetch 'familyData.json', fall back to sample if fails
             fetch('familyData.json')
                 .then(response => {
@@ -768,6 +817,40 @@
             // Redraw with isUpdate = true to keep zoom
             drawTree(rootData, true);
         }
+        
+        // --- EXPAND ALL / COLLAPSE ALL ---
+        function expandAll() {
+            function expand(d) {
+                if (d._children) {
+                    d.children = d._children;
+                    d._children = null;
+                }
+                if (d.children) {
+                    d.children.forEach(expand);
+                }
+            }
+            expand(rootData);
+            drawTree(rootData, true);
+        }
+
+        function collapseAll() {
+            function collapse(d) {
+                if (d.children) {
+                    d._children = d.children;
+                    d._children.forEach(collapse);
+                    d.children = null;
+                }
+            }
+            // Keep the root's children visible to not hide everything completely
+             if (rootData.children) {
+                rootData.children.forEach(collapse);
+            }
+            drawTree(rootData, true);
+        }
+        
+        function printView() {
+            window.print();
+        }
 
         // --- 5. INTERACTION LOGIC ---
 
@@ -826,10 +909,6 @@
 
                 if (!matches.empty()) {
                     matches.classed("rainbow-highlight", true);
-                    
-                    // Optional: Center view on the first match
-                    // This requires finding the x/y of the new D3 node.
-                    // We can skip complex centering to keep logic simple, or do a simple pan if needed.
                 }
 
             } else {
