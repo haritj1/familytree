@@ -1,8 +1,8 @@
 {
   "nodes": [
     { "data": { "id": "u1", "name": "1st Gen: Late 1700s" }},
-    { "data": { "id": "g1_p1", "name": "John Smith I", "gender": "male", "parent": "u1", "born": "1780", "img": "images/g1p1.jpg" }},
-    { "data": { "id": "g1_p2", "name": "Elizabeth Reed", "gender": "female", "parent": "u1", "born": "1785", "img": "images/g1p2.jpg" }},
+    { "data": { "id": "g1_p1", "name": "John Smith I", "gender": "male", "parent": "u1", "born": "1780", "img": "images/g1p1.jpg", "bio": "The family patriarch." }},
+    { "data": { "id": "g1_p2", "name": "Elizabeth Reed", "gender": "female", "parent": "u1", "born": "1785", "img": "images/g1p2.jpg", "bio": "The family matriarch." }},
 
     { "data": { "id": "u2", "name": "2nd Gen: Early 1800s" }},
     { "data": { "id": "g2_p1", "name": "John Smith II", "gender": "male", "parent": "u2", "born": "1810", "img": "images/g2p1.jpg" }},
@@ -33,12 +33,12 @@
     { "data": { "id": "g8_p2", "name": "Emma Wright", "gender": "female", "parent": "u8", "born": "1998", "img": "images/g8p2.jpg" }}
   ],
   "edges": [
-    { "data": { "source": "u1", "target": "g2_p1", "label": "Child" }},
-    { "data": { "source": "u2", "target": "g3_p1", "label": "Child" }},
-    { "data": { "source": "u3", "target": "g4_p1", "label": "Child" }},
-    { "data": { "source": "u4", "target": "g5_p1", "label": "Child" }},
-    { "data": { "source": "u5", "target": "g6_p1", "label": "Child" }},
-    { "data": { "source": "u6", "target": "g7_p1", "label": "Child" }},
-    { "data": { "source": "u7", "target": "g8_p1", "label": "Child" }}
+    { "data": { "source": "u1", "target": "g2_p1", "label": "Child", "type": "parent" }},
+    { "data": { "source": "u2", "target": "g3_p1", "label": "Child", "type": "parent" }},
+    { "data": { "source": "u3", "target": "g4_p1", "label": "Child", "type": "parent" }},
+    { "data": { "source": "u4", "target": "g5_p1", "label": "Child", "type": "parent" }},
+    { "data": { "source": "u5", "target": "g6_p1", "label": "Child", "type": "parent" }},
+    { "data": { "source": "u6", "target": "g7_p1", "label": "Child", "type": "parent" }},
+    { "data": { "source": "u7", "target": "g8_p1", "label": "Child", "type": "parent" }}
   ]
 }
