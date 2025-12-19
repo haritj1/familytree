@@ -1,4 +1,4 @@
-[
+[ 
   { "id": "1", "name": "Laxmana Chetty", "gender": "male", "isAlive": false, "img": "", "spouses": ["2"], "parents": [], "children": ["3"] },
   { "id": "2", "name": "Laxmi Ammal", "gender": "female", "isAlive": false, "img": "", "spouses": ["1"], "parents": [], "children": ["3"] },
   
@@ -44,3 +44,4 @@
   { "id": "37", "name": "Loganathan's Child 8", "gender": "female", "isAlive": true, "img": "", "spouses": [], "parents": ["25", "26"], "children": [] },
   { "id": "38", "name": "Loganathan's Child 9", "gender": "male", "isAlive": true, "img": "", "spouses": [], "parents": ["25", "26"], "children": [] }
 ]
+
