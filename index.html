@@ -249,7 +249,7 @@
                 .then(data => drawTree(data))
                 .catch(err => {
                     console.log("Using sample data (Local fetch blocked or file missing).");
-                    drawTree(sampleData);
+                    drawTree(sampleData_Nofallback);
                 });
         };
 
@@ -511,3 +511,4 @@
     </script>
 </body>
 </html>
+
