@@ -741,8 +741,8 @@
                     if (a.data.spouse) {
                         // Calculate ratio: (SpouseGap + NodeWidth + Gap) / UnitSize
                         // This adds exactly enough space for the spouse card
-                        // Added extra buffer (40px) to prevent overlap visually
-                        const extraBuffer = 40; 
+                        // Increased extra buffer significantly (from 40 to 120) to prevent overlapping
+                        const extraBuffer = 120; 
                         const totalNeeded = config.spouseGap + config.nodeWidth + config.siblingGap + extraBuffer;
                         sep = totalNeeded / nodeSizeX;
                     }
