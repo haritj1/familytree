@@ -95,6 +95,7 @@
                               "name": "Hariprasad TJ",
                               "gender": "male",
                               "status": "living",
+                              "img": "hariprasadTJ.jpg",
                               "spouse": { "name": "Supriya B", "gender": "female", "status": "living" },
                               "children": [ { "name": "Nidheesh Krishna H", "gender": "male", "status": "living" } ]
                             }
@@ -318,3 +319,4 @@
     }
   ]
 }
+
