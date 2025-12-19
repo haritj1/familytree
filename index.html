@@ -293,7 +293,7 @@
             nodeWidth: 160,
             nodeHeight: 80,
             imageSize: 40,
-            siblingGap: 20, 
+            siblingGap: 10, 
             levelGap: 200, 
             spouseGap: 200
         };
@@ -728,24 +728,8 @@
             }
 
             // Create tree layout
-            // UPDATE: Dynamic Separation Logic to reduce gaps
-            const nodeSizeX = config.nodeWidth + config.siblingGap;
-            
-            const treeLayout = d3.tree()
-                .nodeSize([nodeSizeX, config.levelGap])
-                .separation((a, b) => {
-                    let sep = 1; // Default separation
-                    
-                    // If the left node has a spouse, we need extra space
-                    if (a.data.spouse) {
-                        // Calculate total width needed: Spouse Offset + Spouse Width/2 + Gap + Next Node Width/2
-                        const totalNeeded = config.spouseGap + config.nodeWidth + config.siblingGap;
-                        sep = totalNeeded / nodeSizeX;
-                    }
-                    
-                    return a.parent === b.parent ? sep : sep + 0.1;
-                });
-
+            // Reverted to simple fixed spacing to ensure no overlap
+            const treeLayout = d3.tree().nodeSize([config.nodeWidth + config.spouseGap + config.siblingGap, config.levelGap]);
             treeLayout(root);
 
             // Handle initial zoom centering
@@ -1133,4 +1117,3 @@
     </script>
 </body>
 </html>
-
