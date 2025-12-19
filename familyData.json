@@ -1,30 +1,30 @@
 {
   "nodes": [
     { "data": { "id": "u1", "name": "1st Gen: Late 1700s" }},
-    { "data": { "id": "g1_p1", "name": "John Smith I", "gender": "male", "parent": "u1", "born": "1780", "img": "images/g1p1.jpg", "bio": "The family patriarch." }},
-    { "data": { "id": "g1_p2", "name": "Elizabeth Reed", "gender": "female", "parent": "u1", "born": "1785", "img": "images/g1p2.jpg", "bio": "The family matriarch." }},
+    { "data": { "id": "g1_p1", "name": "John Smith I", "gender": "male", "parent": "u1", "born": "1780", "img": "images/g1p1.jpg", "bio": "The family patriarch who settled the original farmstead." }},
+    { "data": { "id": "g1_p2", "name": "Elizabeth Reed", "gender": "female", "parent": "u1", "born": "1785", "img": "images/g1p2.jpg", "bio": "The family matriarch known for her extensive journals." }},
 
-    { "data": { "id": "u2", "name": "2nd Gen: Early 1800s" }},
+    { "data": { "id": "u2", "name": "2nd Gen Household" }},
     { "data": { "id": "g2_p1", "name": "John Smith II", "gender": "male", "parent": "u2", "born": "1810", "img": "images/g2p1.jpg" }},
     { "data": { "id": "g2_p2", "name": "Mary Higgins", "gender": "female", "parent": "u2", "born": "1815", "img": "images/g2p2.jpg" }},
 
-    { "data": { "id": "u3", "name": "3rd Gen: Mid 1800s" }},
+    { "data": { "id": "u3", "name": "3rd Gen Household" }},
     { "data": { "id": "g3_p1", "name": "Samuel Smith", "gender": "male", "parent": "u3", "born": "1840", "img": "images/g3p1.jpg" }},
     { "data": { "id": "g3_p2", "name": "Sarah Cook", "gender": "female", "parent": "u3", "born": "1845", "img": "images/g3p2.jpg" }},
 
-    { "data": { "id": "u4", "name": "4th Gen: Late 1800s" }},
+    { "data": { "id": "u4", "name": "4th Gen Household" }},
     { "data": { "id": "g4_p1", "name": "William Smith", "gender": "male", "parent": "u4", "born": "1870", "img": "images/g4p1.jpg" }},
     { "data": { "id": "g4_p2", "name": "Alice Young", "gender": "female", "parent": "u4", "born": "1875", "img": "images/g4p2.jpg" }},
 
-    { "data": { "id": "u5", "name": "5th Gen: Early 1900s" }},
+    { "data": { "id": "u5", "name": "5th Gen Household" }},
     { "data": { "id": "g5_p1", "name": "Arthur Smith", "gender": "male", "parent": "u5", "born": "1905", "img": "images/g5p1.jpg" }},
     { "data": { "id": "g5_p2", "name": "Rose Miller", "gender": "female", "parent": "u5", "born": "1908", "img": "images/g5p2.jpg" }},
 
-    { "data": { "id": "u6", "name": "6th Gen: Mid 1900s" }},
+    { "data": { "id": "u6", "name": "6th Gen Household" }},
     { "data": { "id": "g6_p1", "name": "Robert Smith", "gender": "male", "parent": "u6", "born": "1935", "img": "images/g6p1.jpg" }},
     { "data": { "id": "g6_p2", "name": "Jane Doe", "gender": "female", "parent": "u6", "born": "1938", "img": "images/g6p2.jpg" }},
 
-    { "data": { "id": "u7", "name": "7th Gen: Late 1900s" }},
+    { "data": { "id": "u7", "name": "7th Gen Household" }},
     { "data": { "id": "g7_p1", "name": "Michael Smith", "gender": "male", "parent": "u7", "born": "1965", "img": "images/g7p1.jpg" }},
     { "data": { "id": "g7_p2", "name": "Linda Vance", "gender": "female", "parent": "u7", "born": "1968", "img": "images/g7p2.jpg" }},
 
@@ -33,12 +33,12 @@
     { "data": { "id": "g8_p2", "name": "Emma Wright", "gender": "female", "parent": "u8", "born": "1998", "img": "images/g8p2.jpg" }}
   ],
   "edges": [
-    { "data": { "source": "u1", "target": "g2_p1", "label": "Child", "type": "parent" }},
-    { "data": { "source": "u2", "target": "g3_p1", "label": "Child", "type": "parent" }},
-    { "data": { "source": "u3", "target": "g4_p1", "label": "Child", "type": "parent" }},
-    { "data": { "source": "u4", "target": "g5_p1", "label": "Child", "type": "parent" }},
-    { "data": { "source": "u5", "target": "g6_p1", "label": "Child", "type": "parent" }},
-    { "data": { "source": "u6", "target": "g7_p1", "label": "Child", "type": "parent" }},
-    { "data": { "source": "u7", "target": "g8_p1", "label": "Child", "type": "parent" }}
+    { "data": { "source": "u1", "target": "g2_p1", "label": "Child" }},
+    { "data": { "source": "u2", "target": "g3_p1", "label": "Child" }},
+    { "data": { "source": "u3", "target": "g4_p1", "label": "Child" }},
+    { "data": { "source": "u4", "target": "g5_p1", "label": "Child" }},
+    { "data": { "source": "u5", "target": "g6_p1", "label": "Child" }},
+    { "data": { "source": "u6", "target": "g7_p1", "label": "Child" }},
+    { "data": { "source": "u7", "target": "g8_p1", "label": "Child" }}
   ]
 }
