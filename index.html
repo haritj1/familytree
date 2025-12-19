@@ -292,7 +292,7 @@
             nodeWidth: 160,
             nodeHeight: 80,
             imageSize: 40,
-            siblingGap: 40, 
+            siblingGap: 10, // Reduced from 40 to 10 for very tight spacing
             levelGap: 200, 
             spouseGap: 200
         };
@@ -639,7 +639,7 @@
         function checkPassword() {
             const password = document.getElementById('passwordInput').value;
             // Simple visual gate - Password is '1234'
-            if (password === 'TRLFamily1$') {
+            if (password === '1234') {
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('controls').style.display = 'flex';
                 document.getElementById('tree-container').style.display = 'block';
