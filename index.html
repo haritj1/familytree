@@ -1,10 +1,299 @@
-<script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Family Tree</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f6f8;
+            --male-color: #e3f2fd;
+            --male-border: #2196f3;
+            --female-color: #fce4ec;
+            --female-border: #e91e63;
+            --living-status: #4caf50;
+            --deceased-status: #757575;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+        }
+
+        /* --- LOGIN OVERLAY --- */
+        #login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .login-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 300px;
+        }
+
+        .login-box h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 10px;
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .login-box button:hover {
+            background: #1976d2;
+        }
+
+        /* Hide main content initially */
+        #controls, #tree-container {
+            display: none;
+        }
+
+        /* Controls Bar */
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 100;
+            /* display: flex;  Set via JS after login */
+            flex-direction: column;
+            gap: 10px;
+            max-width: 300px;
+        }
+
+        h2 { margin: 0 0 10px 0; font-size: 1.2rem; color: #444; }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 5px;
+            justify-content: space-between;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            flex: 1;
+        }
+
+        button:hover { background-color: #1976d2; }
+        button.secondary { background-color: #607d8b; }
+        button.secondary:hover { background-color: #455a64; }
+        button.action-btn { font-size: 0.9em; padding: 6px 10px; }
+
+        /* SVG Styles */
+        #tree-container {
+            width: 100vw;
+            height: 100vh;
+            cursor: grab;
+        }
+        #tree-container:active { cursor: grabbing; }
+
+        .node rect {
+            stroke-width: 2px;
+            transition: all 0.3s;
+        }
+
+        .node text {
+            font-size: 12px;
+            font-family: sans-serif;
+            text-anchor: middle;
+            pointer-events: none;
+            fill: var(--text-color);
+        }
+
+        /* Image styling - Square */
+        .node image {
+            /* clip-path: circle(40%); Removed for square images */
+        }
+
+        .link {
+            fill: none;
+            stroke: #ccc;
+            stroke-width: 2px;
+        }
+
+        /* Search Highlight */
+        @keyframes rainbow { 
+            0% { stroke: #ff0000; stroke-width: 6px; }
+            14% { stroke: #ff7f00; stroke-width: 6px; }
+            28% { stroke: #ffff00; stroke-width: 6px; }
+            42% { stroke: #00ff00; stroke-width: 6px; }
+            57% { stroke: #0000ff; stroke-width: 6px; }
+            71% { stroke: #4b0082; stroke-width: 6px; }
+            85% { stroke: #9400d3; stroke-width: 6px; }
+            100% { stroke: #ff0000; stroke-width: 6px; }
+        }
+
+        .rainbow-highlight rect {
+            animation: rainbow 2s linear infinite;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+        }
+        
+        .deceased-img { filter: grayscale(100%); opacity: 0.8; }
+
+        /* Card Content & Bounce Animation */
+        .card-content {
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .person-group:hover .card-content {
+            transform: translateY(-8px);
+        }
+        .person-group.has-children {
+            cursor: pointer;
+        }
+        .person-group.collapsed rect {
+            stroke-dasharray: 5,5; /* Visual hint for collapsed state */
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            pointer-events: none;
+            font-size: 13px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            max-width: 200px;
+            z-index: 1000;
+        }
+        
+        .tooltip strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            border-bottom: 1px solid #555;
+            padding-bottom: 3px;
+        }
+
+        /* Print Styles */
+        @media print {
+            @page {
+                size: landscape;
+                margin: 0;
+            }
+            body { 
+                background-color: white; 
+                -webkit-print-color-adjust: exact;
+            }
+            #controls, #tooltip, #login-overlay { 
+                display: none !important; 
+            }
+            #tree-container {
+                width: 100%;
+                height: 100%;
+                border: none;
+                display: block !important;
+            }
+            svg {
+                height: 100vh;
+                width: 100vw;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN OVERLAY -->
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2>Secured Family Tree</h2>
+            <p>Please enter the password to view.</p>
+            <input type="password" id="passwordInput" placeholder="Password">
+            <button onclick="checkPassword()">Unlock</button>
+        </div>
+    </div>
+
+    <div id="controls">
+        <h2>Family Tree Controls</h2>
+        
+        <div class="control-group">
+            <input type="text" id="searchInput" placeholder="Search name...">
+            <button onclick="searchNode()">Search</button>
+        </div>
+        
+        <div class="button-row">
+            <button class="action-btn" onclick="expandAll()">Expand All</button>
+            <button class="action-btn" onclick="collapseAll()">Collapse All</button>
+        </div>
+
+        <div class="control-group">
+            <button class="secondary" onclick="resetView()">Reset View</button>
+        </div>
+        
+        <div class="control-group">
+            <button class="secondary" onclick="printView()">Print / Save PDF</button>
+        </div>
+    </div>
+
+    <div id="tree-container"></div>
+    <div id="tooltip" class="tooltip"></div>
+
+    <script>
         // --- 1. CONFIGURATION & STATE ---
         const config = {
             nodeWidth: 160,
             nodeHeight: 80,
             imageSize: 40,
-            siblingGap: 10, // Reverted to 10
+            siblingGap: 10, 
             levelGap: 200, 
             spouseGap: 200
         };
@@ -826,3 +1115,5 @@
         }
 
     </script>
+</body>
+</html>
