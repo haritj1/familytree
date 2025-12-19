@@ -1,5 +1,5 @@
 {
-  "nodes": [
+  "nodes": [ 
     { "data": { "id": "u1", "name": "1st Gen: Late 1700s" }},
     { "data": { "id": "g1_p1", "name": "John Smith I", "gender": "male", "parent": "u1", "born": "1780", "img": "images/g1p1.jpg", "bio": "The family patriarch who settled the original farmstead." }},
     { "data": { "id": "g1_p2", "name": "Elizabeth Reed", "gender": "female", "parent": "u1", "born": "1785", "img": "images/g1p2.jpg", "bio": "The family matriarch known for her extensive journals." }},
@@ -42,3 +42,4 @@
     { "data": { "source": "u7", "target": "g8_p1", "label": "Child" }}
   ]
 }
+
