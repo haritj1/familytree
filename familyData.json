@@ -1,275 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Family Tree</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            overflow: hidden; /* Hide scrollbars, we use zoom/pan */
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+{
+  "id": 1,
+  "name": "Grandpa John",
+  "gender": "M",
+  "spouse": "Grandma Mary",
+  "status": "deceased",
+  "born": "1940",
+  "died": "2015",
+  "img": "1.jpg",
+  "children": [
+    {
+      "id": 2,
+      "name": "Father Robert",
+      "gender": "M",
+      "spouse": "Mother Sarah",
+      "status": "living",
+      "born": "1970",
+      "img": "2.jpg",
+      "children": [
+        {
+          "id": 4,
+          "name": "Son Mike",
+          "gender": "M",
+          "status": "living",
+          "born": "1995",
+          "img": "4.jpg"
+        },
+        {
+          "id": 5,
+          "name": "Daughter Anna",
+          "gender": "F",
+          "status": "living",
+          "born": "1998",
+          "img": "5.jpg"
         }
-
-        /* --- Toolbar --- */
-        #toolbar {
-            padding: 15px;
-            background: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex;
-            gap: 10px;
-            z-index: 10;
-            align-items: center;
-        }
-
-        input[type="text"] {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 200px;
-        }
-
-        button {
-            padding: 8px 15px;
-            background-color: #2c3e50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        button:hover { background-color: #34495e; }
-        button#resetBtn { background-color: #e74c3c; }
-        button#resetBtn:hover { background-color: #c0392b; }
-
-        /* --- Tree Canvas --- */
-        #tree-container {
-            flex-grow: 1;
-            width: 100%;
-            height: 100%;
-            cursor: grab; /* Indicates pannable area */
-        }
-        #tree-container:active { cursor: grabbing; }
-
-        /* --- Node Styling --- */
-        .node rect {
-            fill: #fff;
-            stroke-width: 3px;
-            transition: all 0.3s ease;
-        }
-
-        /* Male/Female Colors */
-        .node.male rect { stroke: #3498db; }    /* Blue */
-        .node.female rect { stroke: #e91e63; }  /* Pink */
-
-        /* Deceased Styling */
-        .node.deceased rect {
-            stroke-dasharray: 5, 5; /* Dashed border */
-            fill: #f9f9f9;
-        }
-        .node.deceased image {
-            filter: grayscale(100%);
-            opacity: 0.6;
-        }
-
-        /* Text Styles */
-        .node text {
-            font: 12px sans-serif;
-            text-anchor: middle;
-            pointer-events: none;
-        }
-        .node .name { font-weight: bold; font-size: 14px; fill: #333; }
-        .node .spouse { font-size: 11px; fill: #666; font-style: italic; }
-        .node .dates { font-size: 10px; fill: #888; }
-
-        /* Search Highlight */
-        .node.highlight rect {
-            stroke: #f1c40f !important; /* Gold */
-            stroke-width: 6px !important;
-            filter: drop-shadow(0 0 8px #f1c40f);
-        }
-
-        /* Links (Lines) */
-        .link {
-            fill: none;
-            stroke: #bbb;
-            stroke-width: 2px;
-        }
-    </style>
-</head>
-<body>
-
-    <div id="toolbar">
-        <h3>Family Tree</h3>
-        <input type="text" id="searchInput" placeholder="Search name...">
-        <button onclick="searchNode()">Search</button>
-        <button id="resetBtn" onclick="resetView()">Reset</button>
-    </div>
-
-    <div id="tree-container"></div>
-
-<script>
-    // --- Configuration ---
-    const config = {
-        nodeWidth: 180,
-        nodeHeight: 100,
-        imageSize: 50
-    };
-
-    // --- Setup SVG & Zoom ---
-    const container = d3.select("#tree-container");
-    const width = container.node().getBoundingClientRect().width;
-    const height = container.node().getBoundingClientRect().height;
-
-    // Create SVG element
-    const svg = container.append("svg")
-        .attr("width", "100%")
-        .attr("height", "100%")
-        .call(d3.zoom().on("zoom", (event) => {
-            g.attr("transform", event.transform);
-        }))
-        .append("g");
-
-    const g = svg.append("g").attr("transform", "translate(40,40)");
-    
-    // Create Tree Layout
-    const tree = d3.tree().nodeSize([config.nodeWidth + 20, config.nodeHeight + 80]);
-
-    let rootData; // Stores the loaded JSON
-
-    // --- Load Data ---
-    d3.json("familyData.json").then(data => {
-        rootData = d3.hierarchy(data);
-        update(rootData);
-        
-        // Initial Center View
-        const initialTransform = d3.zoomIdentity.translate(width/2, 50).scale(1);
-        d3.select("svg").call(d3.zoom().transform, initialTransform);
-    }).catch(err => {
-        console.error(err);
-        alert("Error loading JSON. Remember to run this on a local server (e.g., Live Server) to avoid CORS errors.");
-    });
-
-    function update(source) {
-        const treeData = tree(rootData);
-        const nodes = treeData.descendants();
-        const links = treeData.links();
-
-        // --- Render Links (Connectors) ---
-        // Uses a squared styling for neat family tree look
-        svg.select("g").selectAll(".link")
-            .data(links)
-            .enter().insert("path", "g")
-            .attr("class", "link")
-            .attr("d", d => {
-                return `M${d.source.x},${d.source.y + config.nodeHeight}
-                        V${d.source.y + config.nodeHeight + 40}
-                        H${d.target.x}
-                        V${d.target.y}`;
-            });
-
-        // --- Render Nodes ---
-        const node = svg.select("g").selectAll(".node")
-            .data(nodes)
-            .enter().append("g")
-            .attr("class", d => {
-                let c = "node " + (d.data.gender === "M" ? "male" : "female");
-                if(d.data.status === "deceased") c += " deceased";
-                return c;
-            })
-            .attr("transform", d => `translate(${d.x},${d.y})`)
-            .attr("id", d => "node-" + d.data.id); // Assign ID for search
-
-        // 1. The Card Box
-        node.append("rect")
-            .attr("width", config.nodeWidth)
-            .attr("height", config.nodeHeight)
-            .attr("x", -config.nodeWidth / 2)
-            .attr("rx", 10).attr("ry", 10); // Rounded corners
-
-        // 2. Circular Image Clip
-        node.append("clipPath")
-            .attr("id", d => "clip-" + d.data.id)
-            .append("circle")
-            .attr("r", 25)
-            .attr("cx", 0)
-            .attr("cy", 35);
-
-        // 3. Image
-        node.append("image")
-            .attr("xlink:href", d => d.data.img ? `images/${d.data.img}` : "https://via.placeholder.com/50")
-            .attr("x", -25).attr("y", 10)
-            .attr("width", 50).attr("height", 50)
-            .attr("clip-path", d => `url(#clip-${d.data.id})`);
-
-        // 4. Name
-        node.append("text")
-            .attr("class", "name")
-            .attr("dy", 75)
-            .text(d => d.data.name);
-
-        // 5. Spouse (if exists)
-        node.each(function(d) {
-            if(d.data.spouse) {
-                d3.select(this).append("text")
-                    .attr("class", "spouse")
-                    .attr("dy", 90)
-                    .text(`w/ ${d.data.spouse}`);
-            }
-        });
-
-        // 6. Dates
-        node.append("text")
-            .attr("class", "dates")
-            .attr("dy", -10) // Display above the box
-            .text(d => `${d.data.born} - ${d.data.died || "Present"}`);
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Aunt Jessica",
+      "gender": "F",
+      "spouse": "Uncle Tom",
+      "status": "living",
+      "born": "1975",
+      "img": "3.jpg",
+      "children": [
+          {
+              "id": 6,
+              "name": "Cousin Tim",
+              "gender": "M",
+              "status": "living",
+              "born": "2005"
+          }
+      ]
     }
-
-    // --- Search Function ---
-    function searchNode() {
-        const term = document.getElementById('searchInput').value.toLowerCase();
-        if(!term) return;
-
-        // Reset highlights
-        d3.selectAll(".node").classed("highlight", false);
-
-        let foundNode = null;
-
-        // Iterate through D3 nodes to find match
-        d3.selectAll(".node").each(function(d) {
-            if(d.data.name.toLowerCase().includes(term)) {
-                d3.select(this).classed("highlight", true);
-                foundNode = d;
-            }
-        });
-
-        if(foundNode) {
-            // Zoom to node
-            const transform = d3.zoomIdentity
-                .translate(width/2 - foundNode.x, height/2 - foundNode.y)
-                .scale(1.5);
-            
-            d3.select("svg").transition().duration(750).call(d3.zoom().transform, transform);
-        } else {
-            alert("Person not found.");
-        }
-    }
-
-    // --- Reset Function ---
-    function resetView() {
-        document.getElementById('searchInput').value = "";
-        d3.selectAll(".node").classed("highlight", false);
-        
-        // Return to center top
-        const transform = d3.zoomIdentity.translate(width/2, 50).scale(1);
-        d3.select("svg").transition().duration(750).call(d3.zoom().transform, transform);
-    }
-</script>
-</body>
-</html>
+  ]
+}
