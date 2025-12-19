@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Tree Explorer Pro</title>
+    
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --line-color: #bbb;
+            --male-color: #3498db;
+            --female-color: #e91e63;
+            --other-color: #95a5a6;
+            --bg-color: #f0f2f5;
+            --sidebar-width: 350px;
+        }
+
+        body { margin: 0; overflow: hidden; background-color: var(--bg-color); font-family: 'Segoe UI', sans-serif; }
+
+        /* Anti-Flicker */
+        #tree-wrapper { opacity: 0; transition: opacity 0.4s ease-in; display: inline-block; }
+        #tree-wrapper.ready { opacity: 1; }
+
+        /* UI Layer */
+        .ui-layer { position: fixed; z-index: 1000; padding: 20px; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .ui-layer * { pointer-events: auto; }
+        .search-box { display: flex; gap: 5px; background: white; padding: 5px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        input { border: 1px solid #ddd; padding: 8px; border-radius: 4px; outline: none; width: 180px; }
+        
+        .btn-group { display: flex; gap: 5px; }
+        button { cursor: pointer; background: #333; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; transition: 0.2s; font-size: 12px; }
+        button:hover { background: #555; }
+        .export-btn { background: #27ae60; }
+        .reset-btn { background: #7f8c8d; }
+
+        .filter-bar { background: white; padding: 8px; border-radius: 8px; font-size: 11px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; gap: 10px; align-items: center; }
+        .filter-btn { background: #eee; color: #333; padding: 4px 8px; }
+        .filter-btn:hover { background: #ddd; }
+
+        /* Sidebar */
+        #sidebar {
+            position: fixed; top: 0; right: -400px; width: var(--sidebar-width); height: 100%;
+            background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); transition: 0.3s ease;
+            z-index: 2000; padding: 25px; box-sizing: border-box; overflow-y: auto;
+        }
+        #sidebar.open { right: 0; }
+        .close-sidebar { cursor: pointer; float: right; font-size: 24px; color: #888; }
+        #side-img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; background: #eee; }
+
+        /* Tree Styles */
+        #viewport { width: 100vw; height: 100vh; cursor: grab; }
+        .tree ul { padding-top: 25px; position: relative; display: flex; justify-content: center; margin: 0; }
+        .tree li { text-align: center; list-style-type: none; position: relative; padding: 25px 10px 0 10px; }
+        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid var(--line-color); width: 50%; height: 25px; }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid var(--line-color); }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
+        .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid var(--line-color); border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid var(--line-color); width: 0; height: 25px; }
+
+        /* Cards & Tooltips */
+        .couple { display: inline-flex; align-items: center; gap: 10px; background: white; padding: 10px; border-radius: 12px; border: 1px solid #ddd; transition: 0.3s; }
+        .spouse-connector { width: 20px; height: 2px; background: var(--line-color); }
+        .person-card { position: relative; width: 80px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .person-card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #eee; display: block; margin: 0 auto; transition: 0.3s; }
+        .person-card span { display: block; font-size: 11px; font-weight: bold; margin-top: 5px; color: #333; }
+        
+        .male img { border: 3px solid var(--male-color); }
+        .female img { border: 3px solid var(--female-color); }
+        .other img { border: 3px solid var(--other-color); }
+
+        .tooltip {
+            visibility: hidden; width: 140px; background: #333; color: #fff; text-align: left;
+            border-radius: 6px; padding: 8px; position: absolute; z-index: 100; bottom: 125%;
+            left: 50%; margin-left: -70px; opacity: 0; transition: 0.3s; font-size: 10px; pointer-events: none;
+        }
+        .person-card:hover .tooltip { visibility: visible; opacity: 1; }
+        .highlight img { filter: drop-shadow(0 0 10px #f1c40f); transform: scale(1.15); }
+        .collapsed ul { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div id="sidebar">
+    <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+    <img id="side-img" src="" alt="">
+    <h2 id="side-name"></h2>
+    <p><strong>Birth:</strong> <span id="side-born"></span></p>
+    <p><strong>Died:</strong> <span id="side-died"></span></p>
+    <p><strong>Occupation:</strong> <span id="side-job"></span></p>
+    <hr>
+    <p id="side-bio"></p>
+</div>
+
+<div class="ui-layer">
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Find by name..." onkeypress="if(event.key === 'Enter') searchPerson()">
+        <button onclick="searchPerson()">Find</button>
+    </div>
+    <div class="btn-group">
+        <button class="reset-btn" onclick="resetView()">Reset View</button>
+        <button class="export-btn" onclick="exportTree()">Save Image</button>
+    </div>
+    <div class="filter-bar">
+        <span>Filter:</span>
+        <button class="filter-btn" onclick="filterTree('all')">All</button>
+        <button class="filter-btn" onclick="filterTree('living')">Living</button>
+        <button class="filter-btn" onclick="filterTree('deceased')">Deceased</button>
+    </div>
+</div>
+
+<div id="viewport">
+    <div id="tree-wrapper" class="tree"></div>
+</div>
+
+<script>
+    let globalFamilyData = null;
+
+    function renderPerson(person) {
+        const id = "node-" + person.name.replace(/\s+/g, '-').toLowerCase();
+        const pData = JSON.stringify(person).replace(/"/g, '&quot;');
+        const status = (person.died && person.died !== "Living") ? "Deceased" : "Living";
+        
+        return `
+            <div class="person-card ${person.gender || 'other'}" id="${id}" data-person="${pData}">
+                <img src="${person.img}" onclick="event.stopPropagation(); toggleBranch(this)" onerror="this.src='https://via.placeholder.com/60'">
+                <span onclick="showDetails(${pData})">${person.name}</span>
+                <div class="tooltip">
+                    <strong>${person.name}</strong><br>
+                    Born: ${person.born || '?'}<br>
+                    Status: ${status}
+                </div>
+            </div>
+        `;
+    }
+
+    function createTree(data) {
+        const ul = document.createElement('ul');
+        data.forEach(member => {
+            const li = document.createElement('li');
+            const coupleDiv = document.createElement('div');
+            coupleDiv.className = 'couple';
+            let html = renderPerson(member);
+            if (member.spouse) {
+                html += `<div class="spouse-connector"></div>`;
+                html += renderPerson(member.spouse);
+            }
+            coupleDiv.innerHTML = html;
+            li.appendChild(coupleDiv);
+            if (member.children && member.children.length > 0) {
+                li.appendChild(createTree(member.children));
+            }
+            ul.appendChild(li);
+        });
+        return ul;
+    }
+
+    function toggleBranch(img) { img.closest('li').classList.toggle('collapsed'); }
+
+    function showDetails(person) {
+        document.getElementById('side-img').src = person.img;
+        document.getElementById('side-name').innerText = person.name;
+        document.getElementById('side-born').innerText = person.born || "Unknown";
+        document.getElementById('side-died').innerText = person.died || "Living";
+        document.getElementById('side-job').innerText = person.job || "N/A";
+        document.getElementById('side-bio').innerText = person.bio || "No biography provided.";
+        document.getElementById('sidebar').classList.add('open');
+    }
+
+    function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); }
+
+    function filterTree(type) {
+        document.querySelectorAll('.person-card').forEach(card => {
+            const data = JSON.parse(card.getAttribute('data-person'));
+            const isDeceased = data.died && data.died !== "Living";
+            card.style.opacity = "1";
+            card.style.filter = "none";
+
+            if (type === 'living' && isDeceased) {
+                card.style.opacity = "0.2";
+                card.style.filter = "grayscale(100%)";
+            } else if (type === 'deceased' && !isDeceased) {
+                card.style.opacity = "0.2";
+                card.style.filter = "grayscale(100%)";
+            }
+        });
+    }
+
+    const wrapper = document.getElementById('tree-wrapper');
+    const viewport = d3.select("#viewport");
+    const content = d3.select("#tree-wrapper");
+    const zoom = d3.zoom().scaleExtent([0.1, 3]).on("zoom", (e) => {
+        content.style("transform", `translate(${e.transform.x}px, ${e.transform.y}px) scale(${e.transform.k})`);
+    });
+
+    function resetView() {
+        viewport.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(window.innerWidth / 2 - 100, 100).scale(1));
+    }
+
+    function searchPerson() {
+        const query = document.getElementById('searchInput').value.replace(/\s+/g, '-').toLowerCase();
+        const target = document.getElementById("node-" + query);
+        if (target) {
+            document.querySelectorAll('.person-card').forEach(p => p.classList.remove('highlight'));
+            let p = target.parentElement;
+            while (p && p !== wrapper) { if (p.tagName === 'LI') p.classList.remove('collapsed'); p = p.parentElement; }
+            target.classList.add('highlight');
+            const b = target.getBoundingClientRect();
+            const vb = document.getElementById('viewport').getBoundingClientRect();
+            const x = (vb.width / 2) - (b.left + b.width / 2);
+            const y = (vb.height / 2) - (b.top + b.height / 2);
+            viewport.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(x, y).scale(1.2));
+        }
+    }
+
+    function exportTree() {
+        const originalTransform = wrapper.style.transform;
+        wrapper.style.transform = "scale(1)";
+        html2canvas(wrapper, { useCORS: true, backgroundColor: "#f0f2f5" }).then(canvas => {
+            wrapper.style.transform = originalTransform;
+            const link = document.createElement('a');
+            link.download = 'family-tree.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        fetch('familyData.json')
+            .then(res => res.json())
+            .then(data => {
+                wrapper.appendChild(createTree(data));
+                viewport.call(zoom);
+                resetView();
+                setTimeout(() => wrapper.classList.add('ready'), 150);
+            })
+            .catch(err => console.error("Error loading JSON. Use a local server!", err));
+    });
+</script>
+
+</body>
+</html>
