@@ -144,7 +144,7 @@
     let rootData; // Stores the loaded JSON
 
     // --- Load Data ---
-    d3.json("family_data.json").then(data => {
+    d3.json("familyData.json").then(data => {
         rootData = d3.hierarchy(data);
         update(rootData);
         
@@ -273,3 +273,4 @@
 </script>
 </body>
 </html>
+
