@@ -98,6 +98,7 @@
             font-family: sans-serif;
             text-anchor: middle;
             pointer-events: none;
+            fill: var(--text-color);
         }
 
         .node image {
@@ -111,13 +112,23 @@
         }
 
         /* Search Highlight */
-        .highlight rect {
-            stroke: #ff9800 !important;
-            stroke-width: 4px !important;
-            filter: drop-shadow(0 0 5px #ff9800);
+        @keyframes rainbow { 
+            0% { stroke: #ff0000; stroke-width: 6px; }
+            14% { stroke: #ff7f00; stroke-width: 6px; }
+            28% { stroke: #ffff00; stroke-width: 6px; }
+            42% { stroke: #00ff00; stroke-width: 6px; }
+            57% { stroke: #0000ff; stroke-width: 6px; }
+            71% { stroke: #4b0082; stroke-width: 6px; }
+            85% { stroke: #9400d3; stroke-width: 6px; }
+            100% { stroke: #ff0000; stroke-width: 6px; }
+        }
+
+        .rainbow-highlight rect {
+            animation: rainbow 2s linear infinite;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
         }
         
-        .deceased { filter: grayscale(100%); opacity: 0.9; }
+        .deceased-img { filter: grayscale(100%); opacity: 0.8; }
 
         /* Card Content & Bounce Animation */
         .card-content {
@@ -200,10 +211,12 @@
         let rootData;
 
         // --- 2. SAMPLE DATA ---
+        // Added some "birthYear" fields for demonstration
         const sampleData = {
           "name": "Laxmana chetty",
           "gender": "male",
           "status": "deceased",
+          "birthYear": 1920,
           "spouse": {
             "name": "Laxmi Ammal",
             "gender": "female",
@@ -214,6 +227,7 @@
               "name": "Veerasamy",
               "gender": "male",
               "status": "deceased",
+              "birthYear": 1945,
               "spouse": {
                 "name": "Ellammal",
                 "gender": "female",
@@ -228,6 +242,7 @@
                   "name": "Ayyasamy",
                   "gender": "male",
                   "status": "deceased",
+                  "birthYear": 1955,
                   "spouse": {
                     "name": "Sengammal",
                     "gender": "female",
@@ -252,13 +267,14 @@
                           "name": "Muthukrishnan",
                           "gender": "male",
                           "status": "deceased",
+                          "birthYear": 1980,
                           "spouse": {
                             "name": "Ranganayagi",
                             "gender": "female",
                             "status": "deceased"
                           },
                           "children": [
-                            { "name": "Male1", "gender": "male", "status": "living" },
+                            { "name": "Male1", "gender": "male", "status": "living", "birthYear": 2010 },
                             { "name": "Female2", "gender": "female", "status": "living" },
                             { "name": "Male3", "gender": "male", "status": "living" },
                             {
@@ -275,6 +291,7 @@
                                   "name": "Janakiraman TL",
                                   "gender": "male",
                                   "status": "living",
+                                  "birthYear": 1990,
                                   "spouse": { "name": "Susila K", "gender": "female", "status": "living" },
                                   "children": [
                                     { "name": "Child1", "gender": "female", "status": "deceased" },
@@ -407,6 +424,28 @@
             // Create hierarchy
             const root = d3.hierarchy(data);
 
+            // --- MINIMIZE DEFAULT: Collapse all children of root initially ---
+            // Only runs once on first load
+            if (!isUpdate && !window.treeInitialized) {
+                if (root.children) {
+                    // Use a recursive function that modifies the DATA structure for consistency
+                    function initialCollapse(nodeData) {
+                        if (nodeData.children) {
+                            nodeData._children = nodeData.children;
+                            nodeData._children.forEach(initialCollapse);
+                            nodeData.children = null;
+                        }
+                    }
+                    // Apply to children of root (keep root expanded)
+                    if (data.children) {
+                        data.children.forEach(initialCollapse);
+                    }
+                }
+                window.treeInitialized = true;
+                // Re-run hierarchy creation since we modified the data
+                return drawTree(data, true);
+            }
+
             // Create tree layout
             const treeLayout = d3.tree().nodeSize([config.nodeWidth + config.spouseGap, config.levelGap]);
             treeLayout(root);
@@ -414,6 +453,7 @@
             // Handle initial zoom centering
             if (!isUpdate) {
                 const containerWidth = document.getElementById("tree-container").clientWidth;
+                // Since we start collapsed, root is single node, easier to center
                 const initialX = containerWidth / 2 - root.x;
                 const initialY = 100;
                 svg.call(zoom.transform, d3.zoomIdentity.translate(initialX, initialY).scale(0.8));
@@ -476,15 +516,8 @@
                     
                     let tooltipHtml = `<strong>${personData.name}</strong>`;
                     tooltipHtml += `Gender: ${personData.gender}<br/>`;
-                    tooltipHtml += `Status: ${personData.status}<br/>`;
                     if (personData.spouse) tooltipHtml += `Spouse: ${personData.spouse.name}<br/>`;
-                    if (personData.children || personData._children) {
-                         const count = (personData.children || []).length + (personData._children || []).length;
-                         if (count > 0) tooltipHtml += `Children: ${count}<br/>`;
-                    }
-                    if (personData._children) tooltipHtml += `<em>(Click to Expand)</em>`;
-                    else if (personData.children) tooltipHtml += `<em>(Click to Collapse)</em>`;
-
+                    
                     tooltip.html(tooltipHtml)
                         .style("left", (event.pageX + 15) + "px")
                         .style("top", (event.pageY - 28) + "px");
@@ -524,7 +557,7 @@
                     imgSrc = personData.gender === 'male' ? defaultMale : defaultFemale;
                 }
 
-                contentGroup.append("image")
+                const img = contentGroup.append("image")
                     .attr("href", imgSrc)
                     .attr("width", config.imageSize)
                     .attr("height", config.imageSize)
@@ -532,16 +565,49 @@
                     .attr("y", -config.imageSize / 2)
                     .attr("preserveAspectRatio", "xMidYMid slice");
 
-                // Name
+                if (personData.status === 'deceased') {
+                    img.classed("deceased-img", true);
+                }
+
+                // Name - Moved up slightly
                 contentGroup.append("text")
-                    .attr("dy", "5")
+                    .attr("dy", "-12")
                     .attr("x", 15)
                     .style("font-weight", "bold")
                     .text(personData.name.length > 15 ? personData.name.substring(0,12)+"..." : personData.name);
 
-                // Deceased filter
+                // --- INFO ROW: Age & Child Count ---
+                let infoText = [];
+                
+                // Age Calculation
+                if (personData.birthYear) {
+                    const currentYear = new Date().getFullYear();
+                    infoText.push(`Age: ${currentYear - personData.birthYear}`);
+                }
+                
+                // Child Count Calculation
+                const childCount = (personData.children || []).length + (personData._children || []).length;
+                if (childCount > 0) {
+                    infoText.push(`Children: ${childCount}`);
+                }
+                
+                if (infoText.length > 0) {
+                     contentGroup.append("text")
+                        .attr("dy", "5")
+                        .attr("x", 15)
+                        .style("font-size", "10px")
+                        .text(infoText.join(" | "));
+                }
+
+                // --- STATUS TEXT ---
                 if (personData.status === 'deceased') {
-                    contentGroup.style("filter", "grayscale(0.5)");
+                    contentGroup.append("text")
+                        .attr("dy", "18")
+                        .attr("x", 15)
+                        .style("font-size", "10px")
+                        .style("fill", "#666")
+                        .style("font-style", "italic")
+                        .text("Deceased");
                 }
                 
                 // --- Collapse Indicator (Plus/Minus sign) ---
@@ -629,8 +695,9 @@
             });
         }
         
-        // Function to toggle children
+        // Function to toggle children - UPDATED to persist to DATA
         function toggleChildren(d) {
+            // We modify d (the data object from JSON) directly, not just the D3 node
             if (d.children) {
                 d._children = d.children;
                 d.children = null;
@@ -645,30 +712,80 @@
         // --- 5. INTERACTION LOGIC ---
 
         function searchNode() {
-            const query = document.getElementById("searchInput").value.toLowerCase();
+            const query = document.getElementById("searchInput").value.toLowerCase().trim();
             if (!query) return;
 
-            d3.selectAll(".person-group").classed("highlight", false);
+            // 1. Reset previous highlights
+            d3.selectAll(".person-group").classed("rainbow-highlight", false);
 
-            const matches = d3.selectAll(".person-group").filter(function() {
-                return d3.select(this).attr("data-name").includes(query);
-            });
+            // 2. Helper to find node and path in the RAW DATA structure
+            let foundPath = null;
+            
+            function searchData(node, currentPath) {
+                if (foundPath) return; // Stop if found
 
-            if (matches.empty()) {
-                alert("No matches found");
-                return;
+                // Check main person
+                if (node.name.toLowerCase().includes(query)) {
+                    foundPath = [...currentPath, node];
+                    return;
+                }
+                // Check spouse
+                if (node.spouse && node.spouse.name.toLowerCase().includes(query)) {
+                    // We found the spouse, but we need to expand the main node path
+                    foundPath = [...currentPath, node]; 
+                    return;
+                }
+
+                // Recursive search in children OR _children (hidden ones)
+                const kids = node.children || node._children || [];
+                for (const child of kids) {
+                    searchData(child, [...currentPath, node]);
+                }
             }
 
-            matches.classed("highlight", true);
+            // Start search from root
+            searchData(rootData, []);
+
+            if (foundPath) {
+                // 3. Expand all parents in the path
+                foundPath.forEach(node => {
+                    if (node._children) {
+                        node.children = node._children;
+                        node._children = null;
+                    }
+                });
+
+                // 4. Redraw tree to show expanded nodes
+                drawTree(rootData, true);
+
+                // 5. Highlight the matches in the DOM
+                const matches = d3.selectAll(".person-group").filter(function() {
+                    const dName = d3.select(this).attr("data-name");
+                    return dName.includes(query);
+                });
+
+                if (!matches.empty()) {
+                    matches.classed("rainbow-highlight", true);
+                    
+                    // Optional: Center view on the first match
+                    // This requires finding the x/y of the new D3 node.
+                    // We can skip complex centering to keep logic simple, or do a simple pan if needed.
+                }
+
+            } else {
+                alert("No matches found");
+            }
         }
 
         function resetView() {
             document.getElementById("searchInput").value = "";
+            
+            // Remove highlighting
+            d3.selectAll(".person-group").classed("rainbow-highlight", false);
             d3.selectAll(".person-group").classed("highlight", false);
-            
-            // Expand all logic could go here, but simplest reset is just view reset
+
+            // Re-center view
             const containerWidth = document.getElementById("tree-container").clientWidth;
-            
             svg.transition().duration(750).call(
                 zoom.transform, 
                 d3.zoomIdentity.translate(containerWidth/2, 100).scale(0.8)
