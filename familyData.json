@@ -1,89 +1,70 @@
 {
-  "id": 1,
-  "name": "Grandpa John",
-  "gender": "M",
-  "status": "deceased",
-  "born": "1940",
-  "died": "2015",
-  "img": "1.jpg",
-  "spouse": {
-    "name": "Grandma Mary",
-    "gender": "F",
-    "status": "deceased",
-    "born": "1942",
-    "died": "2018",
-    "img": "mary.jpg",
-    "parents": [
-        {"name": "Mary's Dad"},
-        {"name": "Mary's Mom"}
-    ]
-  },
-  "children": [
-    {
-      "id": 2,
-      "name": "Father Robert",
-      "gender": "M",
-      "status": "living",
-      "born": "1970",
-      "img": "2.jpg",
-      "spouse": {
-        "name": "Mother Sarah",
-        "gender": "F",
-        "status": "living",
-        "born": "1972",
-        "img": "sarah.jpg",
-        "parents": [
-             {"name": "Sarah's Father"}, 
-             {"name": "Sarah's Mother"}
-        ]
-      },
-      "children": [
-        {
-          "id": 4,
-          "name": "Son Mike",
-          "gender": "M",
-          "status": "living",
-          "born": "1995",
-          "img": "4.jpg",
-          "spouse": {
-              "name": "Mike's Wife",
-              "gender": "F",
-              "born": "1996"
-          }
-        },
-        {
-          "id": 5,
-          "name": "Daughter Anna",
-          "gender": "F",
-          "status": "living",
-          "born": "1998",
-          "img": "5.jpg"
-        }
-      ]
-    },
-    {
-      "id": 3,
-      "name": "Aunt Jessica",
-      "gender": "F",
-      "status": "living",
-      "born": "1975",
-      "img": "3.jpg",
-      "spouse": {
-          "name": "Uncle Tom",
-          "gender": "M",
-          "status": "living",
-          "born": "1970",
-          "img": "tom.jpg"
-      },
-      "children": [
+  "family_tree": {
+    "husband": "Laxmana Chetty",
+    "wife": "Laxmi Ammal",
+    "generation": 1,
+    "status": "Deceased",
+    "children": [
+      {
+        "name": "Veerasami",
+        "spouse": "Ellammal",
+        "generation": 2,
+        "status": "Deceased",
+        "children": [
           {
-              "id": 6,
-              "name": "Cousin Tim",
-              "gender": "M",
-              "status": "living",
-              "born": "2005"
+            "name": "Ayyasamy",
+            "spouse": "Sengammal",
+            "generation": 3,
+            "status": "Deceased",
+            "children": [
+              { "name": "Daughter 1", "gender": "Female", "status": "Deceased" },
+              { "name": "Daughter 2", "gender": "Female", "status": "Deceased" },
+              { "name": "Govindasamy", "gender": "Male", "status": "Deceased" },
+              { "name": "Munusamy", "gender": "Male", "status": "Deceased" },
+              {
+                "name": "Parthasarathy",
+                "gender": "Male",
+                "spouse": "Ammani ammal",
+                "generation": 4,
+                "status": "Deceased",
+                "children": [
+                  { "name": "Aadhikesavulu", "gender": "Male", "status": "Deceased" },
+                  { "name": "Kothandam", "gender": "Male", "status": "Deceased" },
+                  { "name": "Balaraman", "gender": "Male", "status": "Deceased" },
+                  { "name": "Thayarammal", "gender": "Female", "status": "Deceased" },
+                  {
+                    "name": "Ramasamy",
+                    "gender": "Male",
+                    "spouse": "Laxmi",
+                    "status": "Deceased"
+                  },
+                  {
+                    "name": "Muthukrishnan",
+                    "gender": "Male",
+                    "spouse": "Ranganayagi",
+                    "generation": 5,
+                    "status": "Deceased",
+                    "children": [
+                      { "name": "Male-1", "gender": "Male", "status": "Deceased" },
+                      { "name": "Female-1", "gender": "Female", "status": "Deceased" },
+                      { "name": "Male-2", "gender": "Male", "status": "Deceased" },
+                      {
+                        "name": "Loganathan",
+                        "gender": "Male",
+                        "spouse": "Savithiri",
+                        "status": "Deceased"
+                      },
+                      { "name": "Narasimmalu", "gender": "Male", "status": "Deceased" },
+                      { "name": "Devagi", "gender": "Female", "status": "Deceased" },
+                      { "name": "Sulochana", "gender": "Female", "status": "Deceased" }
+                    ]
+                  }
+                ]
+              }
+            ]
           }
-      ]
-    }
-  ]
+        ]
+      }
+    ]
+  }
 }
