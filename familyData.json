@@ -1,108 +1,50 @@
 [
-	{
-		"name": "Grandpa Joe",
-		"gender": "male",
-		"born": "1920",
-		"died": "1998",
-		"job": "Ship Captain",
-		"bio": "Joe traveled the world and collected maps from every port he visited.",
-		"img": "images/joe.jpg",
-		"spouse": {
-			"name": "Martha",
-			"gender": "female",
-			"born": "1925",
-			"died": "2010",
-			"job": "Librarian",
-			"img": "images/martha.jpg"
-		},
-		"children": [
-			{
-				"name": "Dad",
-				"gender": "male",
-				"born": "1955",
-				"died": "Living",
-				"job": "Engineer",
-				"img": "images/dad.jpg",
-				"spouse": {
-					"name": "Mom",
-					"gender": "female",
-					"born": "1958",
-					"died": "Living",
-					"img": "images/mom.jpg"
-				},
-				"children": [
-					{
-						"name": "Me",
-						"gender": "male",
-						"born": "1990",
-						"died": "Living",
-						"job": "Developer",
-						"img": "images/me.jpg"
-					},
-					{
-						"name": "Sister",
-						"gender": "female",
-						"born": "1992",
-						"died": "Living",
-						"job": "Artist",
-						"img": "images/sister.jpg"
-					}
-				]
-			}
-		]
-	}
-	
-		{
-		"name": "Grandpa Joe2",
-		"gender": "male",
-		"born": "1920",
-		"died": "1998",
-		"job": "Ship Captain",
-		"bio": "Joe traveled the world and collected maps from every port he visited.",
-		"img": "images/joe.jpg",
-		"spouse": {
-			"name": "Martha",
-			"gender": "female",
-			"born": "1925",
-			"died": "2010",
-			"job": "Librarian",
-			"img": "images/martha.jpg"
-		},
-		"children": [
-			{
-				"name": "Dad",
-				"gender": "male",
-				"born": "1955",
-				"died": "Living",
-				"job": "Engineer",
-				"img": "images/dad.jpg",
-				"spouse": {
-					"name": "Mom",
-					"gender": "female",
-					"born": "1958",
-					"died": "Living",
-					"img": "images/mom.jpg"
-				},
-				"children": [
-					{
-						"name": "Me",
-						"gender": "male",
-						"born": "1990",
-						"died": "Living",
-						"job": "Developer",
-						"img": "images/me.jpg"
-					},
-					{
-						"name": "Sister",
-						"gender": "female",
-						"born": "1992",
-						"died": "Living",
-						"job": "Artist",
-						"img": "images/sister.jpg"
-					}
-				]
-			}
-		]
-	}
-	
+  {
+    "name": "Grandpa Joe",
+    "gender": "male",
+    "born": "1920",
+    "died": "1998",
+    "job": "Ship Captain",
+    "bio": "Joe had two families over his long life at sea.",
+    "img": "images/joe.jpg",
+    "spouses": [
+      {
+        "name": "Grandma Martha",
+        "gender": "female",
+        "born": "1925",
+        "died": "1960",
+        "img": "images/martha.jpg",
+        "marriage": "m. 1945",
+        "children": [
+          {
+            "name": "Dad George",
+            "gender": "male",
+            "born": "1955",
+            "img": "images/dad.jpg",
+            "job": "Engineer",
+            "children": [
+              { "name": "Me", "gender": "male", "born": "1990", "img": "images/me.jpg", "job": "Developer" }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Step-Grandma Sarah",
+        "gender": "female",
+        "born": "1935",
+        "died": "2010",
+        "img": "images/sarah.jpg",
+        "marriage": "m. 1965",
+        "children": [
+          {
+            "name": "Uncle Leo",
+            "gender": "male",
+            "born": "1970",
+            "img": "images/leo.jpg",
+            "job": "Chef"
+          }
+        ]
+      }
+    ]
+  }
 ]
