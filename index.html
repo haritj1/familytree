@@ -2,99 +2,94 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Family Network Archive</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
     <style>
         :root {
             --male-color: #3498db;
             --female-color: #e91e63;
-            --bg-color: #f0f2f5;
-            --sidebar-width: 350px;
+            --bg-color: #f4f7f6;
+            --accent: #2c3e50;
         }
 
         body { margin: 0; overflow: hidden; background: var(--bg-color); font-family: 'Segoe UI', Tahoma, sans-serif; }
+        #cy { width: 100vw; height: 100vh; display: block; }
 
-        /* --- Security Gate --- */
-        #password-overlay { position: fixed; inset: 0; background: #2c3e50; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
-        #password-overlay input { padding: 12px; margin: 10px; border-radius: 4px; border: none; text-align: center; width: 220px; font-size: 16px; }
-
-        /* --- UI Layer --- */
-        .ui-layer { position: fixed; z-index: 1000; padding: 20px; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .ui-layer * { pointer-events: auto; }
-        .btn-group { display: flex; gap: 8px; }
-        .action-btn { cursor: pointer; background: #333; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 12px; }
-
-        /* --- View Containers --- */
-        #cy { width: 100vw; height: 100vh; display: block; background: var(--bg-color); }
-        #gallery-wrapper { position: fixed; inset: 0; background: var(--bg-color); z-index: 500; padding: 100px 50px; overflow-y: auto; display: none; }
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        .gallery-item { background: white; padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .gallery-item img { width: 100%; height: 160px; object-fit: cover; border-radius: 4px; }
+        /* --- UI Controls --- */
+        .ui-panel {
+            position: fixed; top: 20px; left: 20px; z-index: 1000;
+            background: rgba(255, 255, 255, 0.95); padding: 15px; border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 260px;
+        }
+        
+        .search-box { display: flex; gap: 5px; margin-bottom: 12px; }
+        input[type="text"] {
+            padding: 8px; border: 1px solid #ddd; border-radius: 4px; flex-grow: 1; outline: none;
+        }
+        
+        button {
+            cursor: pointer; background: var(--accent); color: white; border: none; 
+            padding: 10px 12px; border-radius: 4px; font-weight: bold; transition: 0.2s;
+        }
+        button:hover { background: #34495e; }
+        .reset-btn { background: #7f8c8d; width: 100%; margin-top: 5px; }
 
         /* --- Sidebar --- */
-        #sidebar { position: fixed; top: 0; right: -400px; width: var(--sidebar-width); height: 100%; background: white; z-index: 2000; padding: 30px; transition: 0.3s; box-shadow: -5px 0 15px rgba(0,0,0,0.1); overflow-y: auto; box-sizing: border-box; }
+        #sidebar { 
+            position: fixed; top: 0; right: -360px; width: 360px; height: 100%; 
+            background: white; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            padding: 25px; box-sizing: border-box;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 2000; overflow-y: auto;
+        }
         #sidebar.open { right: 0; }
-        .close-sidebar { cursor: pointer; float: right; font-size: 24px; color: #888; font-weight: bold; }
-        #side-img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 20px; background: #eee; }
-
-        .hidden { display: none !important; }
+        .close-btn { float: right; cursor: pointer; font-size: 28px; color: #aaa; line-height: 20px; }
+        #side-img { width: 100%; height: 220px; object-fit: cover; border-radius: 8px; background: #eee; margin-top: 15px; }
+        
+        .instruction { font-size: 11px; color: #777; margin-top: 10px; line-height: 1.4; border-top: 1px solid #eee; padding-top: 10px; }
     </style>
 </head>
 <body>
 
-<div id="password-overlay">
-    <h2>Family Vault: Network View</h2>
-    <input type="password" id="passInput" placeholder="Enter Access Code">
-    <button class="action-btn" onclick="checkPassword()" style="background:#27ae60;">Unlock Archive</button>
+<div class="ui-panel">
+    <h2 style="margin:0 0 12px 0; font-size: 18px; color: var(--accent);">Family Network</h2>
+    
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search name..." onkeypress="if(event.key === 'Enter') executeSearch()">
+        <button onclick="executeSearch()">Go</button>
+    </div>
+
+    <div style="display: flex; gap: 5px;">
+        <button onclick="reLayout()" style="flex:1;">Auto-Align</button>
+        <button onclick="cy.fit()" style="flex:1;">Fit All</button>
+    </div>
+    <button class="reset-btn" onclick="clearAll()">Clear Selections</button>
+    
+    <div class="instruction">
+        • Click person for details<br>
+        • Click 2 people to find lineage path<br>
+        • Use scroll wheel to zoom
+    </div>
 </div>
 
 <div id="sidebar">
-    <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+    <span class="close-btn" onclick="closeSidebar()">&times;</span>
     <img id="side-img" src="">
-    <h2 id="side-name" style="margin-top:0;"></h2>
-    <p id="side-meta" style="color:#666;"></p>
+    <h2 id="side-name" style="margin-bottom:5px;"></h2>
+    <p id="side-meta" style="color:#666; font-size: 14px; margin-top:0; font-weight: bold;"></p>
     <hr style="border:0; border-top:1px solid #eee;">
-    <p id="side-bio" style="line-height:1.6; color:#444;"></p>
-</div>
-
-<div class="ui-layer">
-    <div class="btn-group">
-        <button class="action-btn" onclick="toggleView('graph')">Network Graph</button>
-        <button class="action-btn" onclick="toggleView('gallery')">Photo Gallery</button>
-    </div>
-    <div class="btn-group">
-        <button class="action-btn" onclick="filterEdges('parent')" style="background:#e67e22;">Direct Bloodline</button>
-        <button class="action-btn" onclick="filterEdges('all')" style="background:#7f8c8d;">Show All Links</button>
-    </div>
-    <div class="btn-group">
-        <button class="action-btn" onclick="reLayout()">Rearrange</button>
-    </div>
+    <p id="side-bio" style="line-height:1.6; color:#444; font-size: 15px;"></p>
 </div>
 
 <div id="cy"></div>
 
-<div id="gallery-wrapper">
-    <div class="gallery-grid" id="gallery-content"></div>
-</div>
-
 <script>
-    const FAMILY_CODE = "Network2025"; // Set your password here
     let cy;
-    let globalData;
+    let selectedNodes = [];
 
-    function checkPassword() {
-        if(document.getElementById('passInput').value === FAMILY_CODE) {
-            document.getElementById('password-overlay').classList.add('hidden');
-            initApp();
-        } else { alert("Incorrect Code"); }
-    }
-
-    function initApp() {
+    document.addEventListener("DOMContentLoaded", () => {
         fetch('familyData.json')
             .then(res => res.json())
             .then(data => {
-                globalData = data;
                 cy = cytoscape({
                     container: document.getElementById('cy'),
                     elements: data,
@@ -103,79 +98,109 @@
                             selector: 'node',
                             style: {
                                 'label': 'data(name)',
-                                'width': 85, 'height': 85,
+                                'width': 60, 'height': 60,
                                 'background-image': 'data(img)',
                                 'background-fit': 'cover',
-                                'border-width': 4,
+                                'border-width': 3,
                                 'border-color': (n) => n.data('gender') === 'male' ? '#3498db' : '#e91e63',
-                                'font-size': '12px', 'text-valign': 'bottom', 'text-margin-y': 8,
-                                'color': '#333', 'text-outline-width': 2, 'text-outline-color': '#fff'
+                                'font-size': '11px', 'text-valign': 'bottom', 'text-margin-y': 5,
+                                'text-outline-width': 2, 'text-outline-color': '#fff'
+                            }
+                        },
+                        {
+                            selector: ':parent',
+                            style: {
+                                'background-opacity': 0.04,
+                                'background-color': '#2c3e50',
+                                'border-color': '#ccc',
+                                'border-width': 1,
+                                'border-style': 'dashed',
+                                'shape': 'roundrectangle',
+                                'padding': 45,
+                                'label': 'data(name)',
+                                'text-valign': 'top',
+                                'font-weight': 'bold',
+                                'font-size': '14px',
+                                'color': '#2c3e50'
                             }
                         },
                         {
                             selector: 'edge',
                             style: {
-                                'width': 3, 'line-color': '#bbb', 'curve-style': 'bezier',
+                                'width': 2, 'line-color': '#bbb',
                                 'target-arrow-shape': 'triangle', 'target-arrow-color': '#bbb',
-                                'label': 'data(label)', 'font-size': '10px', 'color': '#888',
+                                'curve-style': 'taxi', 'taxi-direction': 'vertical',
+                                'label': 'data(label)', 'font-size': '9px', 'color': '#999',
                                 'text-background-opacity': 1, 'text-background-color': '#fff',
                                 'text-background-padding': '2px'
                             }
                         },
                         {
-                            selector: ':selected',
-                            style: { 'border-color': '#f1c40f', 'border-width': 6 }
+                            selector: '.highlighted',
+                            style: { 'line-color': '#f1c40f', 'target-arrow-color': '#f1c40f', 'width': 6, 'z-index': 999 }
+                        },
+                        {
+                            selector: '.search-match',
+                            style: { 'border-width': 8, 'border-color': '#f1c40f', 'width': 75, 'height': 75 }
                         }
                     ],
-                    layout: { name: 'breadthfirst', directed: true, spacingFactor: 1.5 }
+                    layout: { 
+                        name: 'breadthfirst', directed: true, spacingFactor: 1.25, padding: 50 
+                    }
                 });
 
-                cy.on('tap', 'node', (evt) => showDetails(evt.target.data()));
-            });
-    }
+                // --- Tap Logic ---
+                cy.on('tap', 'node', (evt) => {
+                    const node = evt.target;
+                    if (node.isParent()) return;
 
-    function toggleView(view) {
-        document.getElementById('cy').style.display = view === 'graph' ? 'block' : 'none';
-        document.getElementById('gallery-wrapper').style.display = view === 'gallery' ? 'block' : 'none';
-        if(view === 'gallery') buildGallery();
-    }
+                    showDetails(node.data());
 
-    function filterEdges(type) {
-        if(type === 'all') {
-            cy.edges().style('display', 'element');
-        } else {
-            cy.edges().forEach(edge => {
-                edge.style('display', edge.data('type') === type ? 'element' : 'none');
+                    // Selection for Pathfinding
+                    selectedNodes.push(node);
+                    node.style('border-width', 8);
+
+                    if (selectedNodes.length === 2) {
+                        const path = cy.elements().aStar({ root: selectedNodes[0], goal: selectedNodes[1] }).path;
+                        if (path) path.addClass('highlighted');
+                        selectedNodes = [];
+                    }
+                });
             });
+    });
+
+    // --- Actions ---
+    function executeSearch() {
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        if (!term) return;
+
+        cy.nodes().removeClass('search-match');
+        const matches = cy.nodes().filter(n => n.data('name') && n.data('name').toLowerCase().includes(term));
+        
+        if (matches.length > 0) {
+            matches.addClass('search-match');
+            cy.animate({ center: { eles: matches }, zoom: 1.2 }, { duration: 600 });
         }
     }
 
-    function reLayout() {
-        cy.layout({ name: 'cose', animationDuration: 1000 }).run();
-    }
-
-    function buildGallery() {
-        const content = document.getElementById('gallery-content');
-        content.innerHTML = "";
-        globalData.nodes.forEach(node => {
-            const p = node.data;
-            content.innerHTML += `
-                <div class="gallery-item" onclick='showDetails(${JSON.stringify(p)})'>
-                    <img src="${p.img}" onerror="this.src='https://via.placeholder.com/150'">
-                    <div style="font-weight:bold; margin-top:8px;">${p.name}</div>
-                </div>`;
-        });
-    }
-
     function showDetails(p) {
-        document.getElementById('side-img').src = p.img;
+        document.getElementById('side-img').src = p.img || '';
         document.getElementById('side-name').innerText = p.name;
-        document.getElementById('side-meta').innerText = `Born: ${p.born || 'Unknown'} | ${p.job || ''}`;
-        document.getElementById('side-bio').innerText = p.bio || "Biography details not available.";
+        document.getElementById('side-meta').innerText = `Born: ${p.born || 'Unknown'}`;
+        document.getElementById('side-bio').innerText = p.bio || "No biography available for this ancestor.";
         document.getElementById('sidebar').classList.add('open');
     }
 
     function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); }
+    function reLayout() { cy.layout({ name: 'breadthfirst', directed: true }).run(); }
+    
+    function clearAll() {
+        cy.elements().removeClass('highlighted');
+        cy.elements().removeClass('search-match');
+        cy.nodes().style('border-width', 3);
+        selectedNodes = [];
+        document.getElementById('searchInput').value = "";
+    }
 </script>
 </body>
 </html>
