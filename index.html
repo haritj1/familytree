@@ -178,63 +178,112 @@
         let svg, g, zoom;
         let rootData;
 
-        // --- 2. SAMPLE DATA (Fallback) ---
+        // --- 2. SAMPLE DATA (Updated with requested Family Lineage) ---
         const sampleData = {
-            "name": "Grandpa Joe",
-            "gender": "male",
-            "status": "deceased",
-            "img": "https://via.placeholder.com/150",
-            "spouse": {
-                "name": "Grandma Josephine",
+          "name": "Laxmana chetty",
+          "gender": "male",
+          "status": "deceased",
+          "spouse": {
+            "name": "Laxmi Ammal",
+            "gender": "female",
+            "status": "deceased"
+          },
+          "children": [
+            {
+              "name": "Veerasamy",
+              "gender": "male",
+              "status": "deceased",
+              "spouse": {
+                "name": "Ellammal",
                 "gender": "female",
-                "status": "deceased",
-                "img": "https://via.placeholder.com/150",
-                "parents": [
-                    { "name": "Great-Grandpa (Wife's Dad)", "gender": "male", "status": "deceased" },
-                    { "name": "Great-Grandma (Wife's Mom)", "gender": "female", "status": "deceased" }
-                ]
-            },
-            "children": [
+                "status": "deceased"
+              },
+              "children": [
+                { "name": "Daughter 1", "gender": "female", "status": "deceased" },
+                { "name": "Daughter 2", "gender": "female", "status": "deceased" },
+                { "name": "Govindasamy", "gender": "male", "status": "deceased" },
+                { "name": "Munusamy", "gender": "male", "status": "deceased" },
                 {
-                    "name": "Uncle Bob",
-                    "gender": "male",
-                    "status": "living",
-                    "spouse": {
-                        "name": "Aunt Clarice",
-                        "gender": "female",
-                        "status": "living"
-                    },
-                    "children": [
-                        { "name": "Cousin Tim", "gender": "male", "status": "living" },
-                        { "name": "Cousin Anna", "gender": "female", "status": "living" }
-                    ]
-                },
-                {
-                    "name": "Mom",
+                  "name": "Ayyasamy",
+                  "gender": "male",
+                  "status": "deceased",
+                  "spouse": {
+                    "name": "Sengammal",
                     "gender": "female",
-                    "status": "living",
-                    "spouse": {
-                        "name": "Dad",
-                        "gender": "male",
-                        "status": "living",
-                        "parents": [
-                            { "name": "Dad's Father", "gender": "male", "status": "deceased" }
-                        ]
-                    },
-                    "children": [
-                        { 
-                            "name": "Me", 
-                            "gender": "male", 
-                            "status": "living",
-                            "spouse": { "name": "Wife", "gender": "female", "status": "living" },
-                            "children": [
-                                { "name": "Son", "gender": "male", "status": "living" }
-                            ]
+                    "status": "deceased"
+                  },
+                  "children": [
+                    {
+                      "name": "Parthasarathy",
+                      "gender": "male",
+                      "status": "deceased",
+                      "spouse": {
+                        "name": "Ammani Ammal",
+                        "gender": "female",
+                        "status": "deceased"
+                      },
+                      "children": [
+                        { "name": "Adhikesavulu", "gender": "male", "status": "deceased" },
+                        { "name": "Kothandam", "gender": "male", "status": "deceased" },
+                        { "name": "Balaraman", "gender": "male", "status": "deceased" },
+                        { "name": "Thayarammal", "gender": "female", "status": "deceased" },
+                        {
+                          "name": "Muthukrishnan",
+                          "gender": "male",
+                          "status": "deceased",
+                          "spouse": {
+                            "name": "Ranganayagi",
+                            "gender": "female",
+                            "status": "deceased"
+                          },
+                          "children": [
+                            { "name": "Male1", "gender": "male", "status": "living" },
+                            { "name": "Female2", "gender": "female", "status": "living" },
+                            { "name": "Male3", "gender": "male", "status": "living" },
+                            {
+                              "name": "Loganathan",
+                              "gender": "male",
+                              "status": "living",
+                              "spouse": {
+                                "name": "Savithiri",
+                                "gender": "female",
+                                "status": "living"
+                              },
+                              "children": [
+                                { "name": "Child 1", "gender": "male", "status": "living" },
+                                { "name": "Child 2", "gender": "female", "status": "living" },
+                                { "name": "Child 3", "gender": "male", "status": "living" },
+                                { "name": "Child 4", "gender": "female", "status": "living" },
+                                { "name": "Child 5", "gender": "male", "status": "living" },
+                                { "name": "Child 6", "gender": "female", "status": "living" },
+                                { "name": "Child 7", "gender": "male", "status": "living" },
+                                { "name": "Child 8", "gender": "female", "status": "living" },
+                                { "name": "Child 9", "gender": "male", "status": "living" }
+                              ]
+                            },
+                            { "name": "Narasimmalu", "gender": "male", "status": "living" },
+                            { "name": "Devagi", "gender": "female", "status": "living" },
+                            { "name": "Sulochana", "gender": "female", "status": "living" }
+                          ]
                         },
-                        { "name": "Sister", "gender": "female", "status": "living" }
-                    ]
+                        {
+                          "name": "Ramasamy",
+                          "gender": "male",
+                          "status": "deceased",
+                          "spouse": {
+                            "name": "Laxmi",
+                            "gender": "female",
+                            "status": "deceased"
+                          }
+                        }
+                      ]
+                    },
+                    { "name": "Devaraj", "gender": "male", "status": "deceased" }
+                  ]
                 }
-            ]
+              ]
+            }
+          ]
         };
 
         // --- 3. INITIALIZATION ---
@@ -249,7 +298,7 @@
                 .then(data => drawTree(data))
                 .catch(err => {
                     console.log("Using sample data (Local fetch blocked or file missing).");
-                    drawTree(sampleData_Nofallback);
+                    drawTree(sampleData);
                 });
         };
 
@@ -511,4 +560,3 @@
     </script>
 </body>
 </html>
-
