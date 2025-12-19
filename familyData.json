@@ -14,4 +14,31 @@
 
     { "data": { "id": "u4", "name": "4th Gen: Late 1800s" }},
     { "data": { "id": "g4_p1", "name": "William Smith", "gender": "male", "parent": "u4", "born": "1870", "img": "images/g4p1.jpg" }},
-    { "data": { "id": "g4_p2", "name": "Alice Young", "gender": "female", "parent":
+    { "data": { "id": "g4_p2", "name": "Alice Young", "gender": "female", "parent": "u4", "born": "1875", "img": "images/g4p2.jpg" }},
+
+    { "data": { "id": "u5", "name": "5th Gen: Early 1900s" }},
+    { "data": { "id": "g5_p1", "name": "Arthur Smith", "gender": "male", "parent": "u5", "born": "1905", "img": "images/g5p1.jpg" }},
+    { "data": { "id": "g5_p2", "name": "Rose Miller", "gender": "female", "parent": "u5", "born": "1908", "img": "images/g5p2.jpg" }},
+
+    { "data": { "id": "u6", "name": "6th Gen: Mid 1900s" }},
+    { "data": { "id": "g6_p1", "name": "Robert Smith", "gender": "male", "parent": "u6", "born": "1935", "img": "images/g6p1.jpg" }},
+    { "data": { "id": "g6_p2", "name": "Jane Doe", "gender": "female", "parent": "u6", "born": "1938", "img": "images/g6p2.jpg" }},
+
+    { "data": { "id": "u7", "name": "7th Gen: Late 1900s" }},
+    { "data": { "id": "g7_p1", "name": "Michael Smith", "gender": "male", "parent": "u7", "born": "1965", "img": "images/g7p1.jpg" }},
+    { "data": { "id": "g7_p2", "name": "Linda Vance", "gender": "female", "parent": "u7", "born": "1968", "img": "images/g7p2.jpg" }},
+
+    { "data": { "id": "u8", "name": "8th Gen: Current" }},
+    { "data": { "id": "g8_p1", "name": "David Smith", "gender": "male", "parent": "u8", "born": "1995", "img": "images/g8p1.jpg" }},
+    { "data": { "id": "g8_p2", "name": "Emma Wright", "gender": "female", "parent": "u8", "born": "1998", "img": "images/g8p2.jpg" }}
+  ],
+  "edges": [
+    { "data": { "source": "u1", "target": "g2_p1", "label": "Child" }},
+    { "data": { "source": "u2", "target": "g3_p1", "label": "Child" }},
+    { "data": { "source": "u3", "target": "g4_p1", "label": "Child" }},
+    { "data": { "source": "u4", "target": "g5_p1", "label": "Child" }},
+    { "data": { "source": "u5", "target": "g6_p1", "label": "Child" }},
+    { "data": { "source": "u6", "target": "g7_p1", "label": "Child" }},
+    { "data": { "source": "u7", "target": "g8_p1", "label": "Child" }}
+  ]
+}
