@@ -122,14 +122,25 @@
         /* Tooltip */
         .tooltip {
             position: absolute;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             color: white;
-            padding: 8px;
-            border-radius: 4px;
+            padding: 10px;
+            border-radius: 6px;
             pointer-events: none;
-            font-size: 12px;
+            font-size: 13px;
             opacity: 0;
             transition: opacity 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            max-width: 200px;
+            z-index: 1000;
+        }
+        
+        .tooltip strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            border-bottom: 1px solid #555;
+            padding-bottom: 3px;
         }
 
     </style>
@@ -452,7 +463,43 @@
                 const group = selection.append("g")
                     .attr("transform", `translate(${offsetX}, ${offsetY})`)
                     .attr("class", "person-group")
-                    .attr("data-name", personData.name.toLowerCase()); // For search
+                    .attr("data-name", personData.name.toLowerCase())
+                    .style("cursor", "pointer");
+
+                // --- TOOLTIP INTERACTION ---
+                const tooltip = d3.select("#tooltip");
+                group.on("mouseover", function(event) {
+                    tooltip.transition().duration(200).style("opacity", 1);
+                    
+                    let tooltipHtml = `<strong>${personData.name}</strong>`;
+                    tooltipHtml += `Gender: ${personData.gender}<br/>`;
+                    tooltipHtml += `Status: ${personData.status}<br/>`;
+                    if (personData.spouse) {
+                        tooltipHtml += `Spouse: ${personData.spouse.name}<br/>`;
+                    }
+                    if (personData.parents && personData.parents.length > 0) {
+                         tooltipHtml += `Parents: ${personData.parents.map(p => p.name).join(", ")}<br/>`;
+                    }
+                    if (personData.children && personData.children.length > 0) {
+                        tooltipHtml += `Children: ${personData.children.length}`;
+                    }
+
+                    tooltip.html(tooltipHtml)
+                        .style("left", (event.pageX + 15) + "px")
+                        .style("top", (event.pageY - 28) + "px");
+                    
+                    // Highlight on hover
+                    d3.select(this).select("rect").style("filter", "brightness(0.95)");
+                })
+                .on("mousemove", function(event) {
+                     tooltip.style("left", (event.pageX + 15) + "px")
+                            .style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", function() {
+                    tooltip.transition().duration(500).style("opacity", 0);
+                    d3.select(this).select("rect").style("filter", null);
+                });
+
 
                 const color = personData.gender === 'male' ? 'var(--male-color)' : 'var(--female-color)';
                 const borderColor = personData.gender === 'male' ? 'var(--male-border)' : 'var(--female-border)';
@@ -469,29 +516,34 @@
                     .attr("stroke", statusColor) // Status indicates border color
                     .attr("stroke-width", 3);
 
-                // Image (or placeholder)
+                // --- IMAGE LOADING LOGIC ---
+                // If it's a full URL (http), use it. 
+                // If it's a filename, assume it's in images/ folder.
+                // If missing, use default icon.
+                let imgSrc;
+                const defaultMale = "https://cdn-icons-png.flaticon.com/512/4128/4128176.png";
+                const defaultFemale = "https://cdn-icons-png.flaticon.com/512/4128/4128249.png";
+                
+                if (personData.img && personData.img.trim() !== "") {
+                    imgSrc = personData.img.startsWith("http") ? personData.img : "images/" + personData.img;
+                } else {
+                    imgSrc = personData.gender === 'male' ? defaultMale : defaultFemale;
+                }
+
                 group.append("image")
-                    .attr("href", personData.img || (personData.gender === 'male' 
-                        ? "https://cdn-icons-png.flaticon.com/512/4128/4128176.png" 
-                        : "https://cdn-icons-png.flaticon.com/512/4128/4128249.png"))
+                    .attr("href", imgSrc)
                     .attr("width", config.imageSize)
                     .attr("height", config.imageSize)
                     .attr("x", -config.nodeWidth / 2 + 10)
-                    .attr("y", -config.imageSize / 2);
+                    .attr("y", -config.imageSize / 2)
+                    .attr("preserveAspectRatio", "xMidYMid slice"); // Ensure image fits well
 
                 // Name
                 group.append("text")
-                    .attr("dy", "-5")
+                    .attr("dy", "5")
                     .attr("x", 15) // Shift text right due to image
                     .style("font-weight", "bold")
                     .text(personData.name.length > 15 ? personData.name.substring(0,12)+"..." : personData.name);
-
-                // Status/Details Text
-                group.append("text")
-                    .attr("dy", "15")
-                    .attr("x", 15)
-                    .style("font-size", "10px")
-                    .text(personData.status.toUpperCase());
 
                 // Visual indicator for Deceased
                 if (personData.status === 'deceased') {
