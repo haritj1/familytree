@@ -1,112 +1,89 @@
 {
   "id": 1,
-  "name": "Gen 1: Ancient Ancestor 1",
+  "name": "Grandpa John",
   "gender": "M",
-  "spouse": "Gen 1: Wife",
   "status": "deceased",
-  "born": "1750",
-  "died": "1820",
+  "born": "1940",
+  "died": "2015",
   "img": "1.jpg",
+  "spouse": {
+    "name": "Grandma Mary",
+    "gender": "F",
+    "status": "deceased",
+    "born": "1942",
+    "died": "2018",
+    "img": "mary.jpg",
+    "parents": [
+        {"name": "Mary's Dad"},
+        {"name": "Mary's Mom"}
+    ]
+  },
   "children": [
     {
       "id": 2,
-      "name": "Gen 2: G-G-G-G Grandpa",
+      "name": "Father Robert",
       "gender": "M",
-      "spouse": "Gen 2: Wife",
-      "status": "deceased",
-      "born": "1780",
-      "died": "1855",
+      "status": "living",
+      "born": "1970",
+      "img": "2.jpg",
+      "spouse": {
+        "name": "Mother Sarah",
+        "gender": "F",
+        "status": "living",
+        "born": "1972",
+        "img": "sarah.jpg",
+        "parents": [
+             {"name": "Sarah's Father"}, 
+             {"name": "Sarah's Mother"}
+        ]
+      },
       "children": [
         {
-          "id": 3,
-          "name": "Gen 3: G-G-G Grandpa",
+          "id": 4,
+          "name": "Son Mike",
           "gender": "M",
-          "spouse": "Gen 3: Wife",
-          "status": "deceased",
-          "born": "1810",
-          "died": "1890",
-          "children": [
-            {
-              "id": 4,
-              "name": "Gen 4: G-G Grandpa",
-              "gender": "M",
-              "spouse": "Gen 4: Wife",
-              "status": "deceased",
-              "born": "1845",
-              "died": "1910",
-              "children": [
-                {
-                  "id": 5,
-                  "name": "Gen 5: Great Grandpa",
-                  "gender": "M",
-                  "spouse": "Gen 5: Wife",
-                  "status": "deceased",
-                  "born": "1880",
-                  "died": "1950",
-                  "children": [
-                    {
-                      "id": 6,
-                      "name": "Gen 6: Grandpa John",
-                      "gender": "M",
-                      "spouse": "Grandma Mary",
-                      "status": "deceased",
-                      "born": "1915",
-                      "died": "1990",
-                      "img": "6.jpg",
-                      "children": [
-                        {
-                          "id": 7,
-                          "name": "Gen 7: Father Robert",
-                          "gender": "M",
-                          "spouse": "Mother Sarah",
-                          "status": "living",
-                          "born": "1950",
-                          "img": "7.jpg",
-                          "children": [
-                            {
-                              "id": 8,
-                              "name": "Gen 8: Son Mike (You)",
-                              "gender": "M",
-                              "status": "living",
-                              "born": "1980",
-                              "img": "8.jpg"
-                            },
-                            {
-                              "id": 9,
-                              "name": "Gen 8: Sister Jane",
-                              "gender": "F",
-                              "status": "living",
-                              "born": "1982"
-                            }
-                          ]
-                        },
-                        {
-                          "id": 10,
-                          "name": "Gen 7: Aunt Susan",
-                          "gender": "F",
-                          "spouse": "Uncle Bob",
-                          "status": "living",
-                          "born": "1955",
-                          "children": [
-                              {
-                                  "id": 11,
-                                  "name": "Gen 8: Cousin Tim",
-                                  "gender": "M",
-                                  "born": "1985",
-                                  "status": "living"
-                              }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
+          "status": "living",
+          "born": "1995",
+          "img": "4.jpg",
+          "spouse": {
+              "name": "Mike's Wife",
+              "gender": "F",
+              "born": "1996"
+          }
+        },
+        {
+          "id": 5,
+          "name": "Daughter Anna",
+          "gender": "F",
+          "status": "living",
+          "born": "1998",
+          "img": "5.jpg"
         }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Aunt Jessica",
+      "gender": "F",
+      "status": "living",
+      "born": "1975",
+      "img": "3.jpg",
+      "spouse": {
+          "name": "Uncle Tom",
+          "gender": "M",
+          "status": "living",
+          "born": "1970",
+          "img": "tom.jpg"
+      },
+      "children": [
+          {
+              "id": 6,
+              "name": "Cousin Tim",
+              "gender": "M",
+              "status": "living",
+              "born": "2005"
+          }
       ]
     }
   ]
 }
-
