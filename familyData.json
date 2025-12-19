@@ -1,50 +1,17 @@
-[
-  {
-    "name": "Grandpa Joe",
-    "gender": "male",
-    "born": "1920",
-    "died": "1998",
-    "job": "Ship Captain",
-    "bio": "Joe had two families over his long life at sea.",
-    "img": "images/joe.jpg",
-    "spouses": [
-      {
-        "name": "Grandma Martha",
-        "gender": "female",
-        "born": "1925",
-        "died": "1960",
-        "img": "images/martha.jpg",
-        "marriage": "m. 1945",
-        "children": [
-          {
-            "name": "Dad George",
-            "gender": "male",
-            "born": "1955",
-            "img": "images/dad.jpg",
-            "job": "Engineer",
-            "children": [
-              { "name": "Me", "gender": "male", "born": "1990", "img": "images/me.jpg", "job": "Developer" }
-            ]
-          }
-        ]
-      },
-      {
-        "name": "Step-Grandma Sarah",
-        "gender": "female",
-        "born": "1935",
-        "died": "2010",
-        "img": "images/sarah.jpg",
-        "marriage": "m. 1965",
-        "children": [
-          {
-            "name": "Uncle Leo",
-            "gender": "male",
-            "born": "1970",
-            "img": "images/leo.jpg",
-            "job": "Chef"
-          }
-        ]
-      }
-    ]
-  }
-]
+{
+  "nodes": [
+    { "data": { "id": "p1", "name": "Grandpa Joe", "gender": "male", "born": "1920", "job": "Captain", "img": "images/joe.jpg", "bio": "A traveler of the seas." }},
+    { "data": { "id": "p2", "name": "Grandma Martha", "gender": "female", "born": "1925", "job": "Librarian", "img": "images/martha.jpg", "bio": "Lover of books." }},
+    { "data": { "id": "p3", "name": "Dad George", "gender": "male", "born": "1955", "job": "Engineer", "img": "images/dad.jpg", "bio": "Built bridges." }},
+    { "data": { "id": "p4", "name": "Mom Mary", "gender": "female", "born": "1958", "job": "Doctor", "img": "images/mom.jpg", "bio": "Healed many." }},
+    { "data": { "id": "p5", "name": "Me", "gender": "male", "born": "1990", "job": "Coder", "img": "images/me.jpg", "bio": "Built this graph." }}
+  ],
+  "edges": [
+    { "data": { "id": "e1", "source": "p1", "target": "p2", "type": "spouse", "label": "Married" }},
+    { "data": { "id": "e2", "source": "p1", "target": "p3", "type": "parent", "label": "Father" }},
+    { "data": { "id": "e3", "source": "p2", "target": "p3", "type": "parent", "label": "Mother" }},
+    { "data": { "id": "e4", "source": "p3", "target": "p4", "type": "spouse", "label": "Married" }},
+    { "data": { "id": "e5", "source": "p3", "target": "p5", "type": "parent", "label": "Father" }},
+    { "data": { "id": "e6", "source": "p4", "target": "p5", "type": "parent", "label": "Mother" }}
+  ]
+}
