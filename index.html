@@ -292,7 +292,7 @@
             nodeWidth: 160,
             nodeHeight: 80,
             imageSize: 40,
-            siblingGap: 10, // Reduced from 40 to 10 for very tight spacing
+            siblingGap: 20, // Slightly increased from 10 to 20 for visual balance with the dynamic logic
             levelGap: 200, 
             spouseGap: 200
         };
@@ -727,8 +727,28 @@
             }
 
             // Create tree layout
-            // Updated to include siblingGap in the x-dimension calculation
-            const treeLayout = d3.tree().nodeSize([config.nodeWidth + config.spouseGap + config.siblingGap, config.levelGap]);
+            // UPDATE: Dynamic Separation Logic to reduce gaps
+            const nodeSizeX = config.nodeWidth + config.siblingGap;
+            
+            const treeLayout = d3.tree()
+                .nodeSize([nodeSizeX, config.levelGap])
+                .separation((a, b) => {
+                    // Calculate separation based on whether the left node (a) has a spouse
+                    // If 'a' has a spouse, we need to push 'b' further to the right
+                    
+                    let sep = 1; // Default separation (1 unit of nodeSizeX)
+                    
+                    if (a.data.spouse) {
+                        // Calculate ratio: (SpouseGap + NodeWidth + Gap) / UnitSize
+                        // This adds exactly enough space for the spouse card
+                        const totalNeeded = config.spouseGap + config.nodeWidth + config.siblingGap;
+                        sep = totalNeeded / nodeSizeX;
+                    }
+                    
+                    // Allow slightly more gap between cousins (different parents)
+                    return a.parent === b.parent ? sep : sep + 0.2;
+                });
+
             treeLayout(root);
 
             // Handle initial zoom centering
@@ -1116,4 +1136,3 @@
     </script>
 </body>
 </html>
-
