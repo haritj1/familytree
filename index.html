@@ -292,7 +292,7 @@
             nodeWidth: 160,
             nodeHeight: 80,
             imageSize: 40,
-            siblingGap: 20, // Slightly increased from 10 to 20 for visual balance with the dynamic logic
+            siblingGap: 20, // Keep this small for siblings without spouses
             levelGap: 200, 
             spouseGap: 200
         };
@@ -741,7 +741,9 @@
                     if (a.data.spouse) {
                         // Calculate ratio: (SpouseGap + NodeWidth + Gap) / UnitSize
                         // This adds exactly enough space for the spouse card
-                        const totalNeeded = config.spouseGap + config.nodeWidth + config.siblingGap;
+                        // Added extra buffer (40px) to prevent overlap visually
+                        const extraBuffer = 40; 
+                        const totalNeeded = config.spouseGap + config.nodeWidth + config.siblingGap + extraBuffer;
                         sep = totalNeeded / nodeSizeX;
                     }
                     
