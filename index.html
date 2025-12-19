@@ -293,7 +293,7 @@
             nodeWidth: 160,
             nodeHeight: 80,
             imageSize: 40,
-            siblingGap: 10, 
+            siblingGap: 20, 
             levelGap: 200, 
             spouseGap: 200
         };
@@ -640,7 +640,7 @@
         function checkPassword() {
             const password = document.getElementById('passwordInput').value;
             // Simple visual gate - Password is '1234'
-            if (password === 'TRLFamily1$') {
+            if (password === '1234') {
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('controls').style.display = 'flex';
                 document.getElementById('tree-container').style.display = 'block';
@@ -728,8 +728,24 @@
             }
 
             // Create tree layout
-            // Updated to include siblingGap in the x-dimension calculation
-            const treeLayout = d3.tree().nodeSize([config.nodeWidth + config.spouseGap + config.siblingGap, config.levelGap]);
+            // UPDATE: Dynamic Separation Logic to reduce gaps
+            const nodeSizeX = config.nodeWidth + config.siblingGap;
+            
+            const treeLayout = d3.tree()
+                .nodeSize([nodeSizeX, config.levelGap])
+                .separation((a, b) => {
+                    let sep = 1; // Default separation
+                    
+                    // If the left node has a spouse, we need extra space
+                    if (a.data.spouse) {
+                        // Calculate total width needed: Spouse Offset + Spouse Width/2 + Gap + Next Node Width/2
+                        const totalNeeded = config.spouseGap + config.nodeWidth + config.siblingGap;
+                        sep = totalNeeded / nodeSizeX;
+                    }
+                    
+                    return a.parent === b.parent ? sep : sep + 0.1;
+                });
+
             treeLayout(root);
 
             // Handle initial zoom centering
