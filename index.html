@@ -2,64 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>8-Generation Family Legacy</title>
+    <title>4-Generation Vertical Tree</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
     <style>
         :root {
-            --male: #3498db;
-            --female: #e91e63;
-            --bg: #f8f9fa;
+            --male: #2980b9;
+            --female: #c0392b;
+            --bg: #ecf0f1;
+            --box-bg: #ffffff;
         }
 
-        body { margin: 0; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', sans-serif; }
+        body { margin: 0; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         #cy { width: 100vw; height: 100vh; display: block; }
 
         /* UI Panel */
         .ui-panel {
             position: fixed; top: 20px; left: 20px; z-index: 1000;
-            background: white; padding: 15px; border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 280px;
+            background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 250px; border-left: 5px solid #2c3e50;
         }
-        .search-box { display: flex; gap: 5px; margin-bottom: 10px; }
-        input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; flex-grow: 1; outline: none; }
-        button { cursor: pointer; background: #2c3e50; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; }
         
+        .search-box { display: flex; gap: 5px; margin-bottom: 15px; }
+        input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex-grow: 1; outline: none; }
+        button { cursor: pointer; background: #34495e; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; transition: 0.2s; }
+        button:hover { background: #2c3e50; }
+
         /* Sidebar */
         #sidebar { 
-            position: fixed; top: 0; right: -380px; width: 380px; height: 100%; 
-            background: white; transition: 0.3s ease; padding: 30px; box-sizing: border-box;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 2000; overflow-y: auto;
+            position: fixed; top: 0; right: -400px; width: 350px; height: 100%; 
+            background: white; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); 
+            padding: 30px; box-sizing: border-box;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.15); z-index: 2000; overflow-y: auto;
         }
         #sidebar.open { right: 0; }
-        #side-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; background: #eee; }
-        .close-btn { float: right; cursor: pointer; font-size: 24px; color: #aaa; }
+        .close-btn { float: right; cursor: pointer; font-size: 28px; color: #7f8c8d; }
+        #side-img { width: 100%; height: 250px; object-fit: cover; border-radius: 4px; background: #eee; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        h3 { margin: 0 0 5px 0; color: #2c3e50; }
+        .instruction { font-size: 12px; color: #7f8c8d; margin-top: 10px; line-height: 1.5; }
     </style>
 </head>
 <body>
 
 <div class="ui-panel">
-    <h3 style="margin:0 0 10px 0;">8-Generation Archive</h3>
+    <h3>Family Lineage</h3>
+    <div style="font-size: 11px; color: #7f8c8d; margin-bottom: 10px;">4 Generations • Vertical View</div>
+    
     <div class="search-box">
         <input type="text" id="searchInput" placeholder="Search name..." onkeypress="if(event.key === 'Enter') doSearch()">
         <button onclick="doSearch()">Go</button>
     </div>
+    
     <div style="display:flex; gap:5px;">
-        <button onclick="cy.fit()" style="flex:1">View All</button>
-        <button onclick="clearAll()" style="flex:1; background:#7f8c8d;">Reset</button>
+        <button onclick="cy.fit()" style="flex:1">Fit to Screen</button>
+        <button onclick="clearAll()" style="flex:1; background:#95a5a6;">Reset</button>
     </div>
-    <p style="font-size: 11px; color: #777; margin-top: 10px; line-height: 1.4;">
+    
+    <div class="instruction">
+        • Scroll to Zoom<br>
         • Click person for details<br>
-        • Click 2 people to find lineage path
-    </p>
+        • Click 2 people for path
+    </div>
 </div>
 
 <div id="sidebar">
     <span class="close-btn" onclick="closeSidebar()">&times;</span>
     <img id="side-img" src="">
-    <h2 id="side-name"></h2>
-    <p id="side-meta" style="font-weight:bold; color:#666;"></p>
-    <hr style="border:0; border-top:1px solid #eee;">
-    <p id="side-bio"></p>
+    <h2 id="side-name" style="margin-bottom: 5px; color: #2c3e50;"></h2>
+    <p id="side-meta" style="color:#7f8c8d; font-weight: bold; margin-top: 0;"></p>
+    <hr style="border:0; border-top:1px solid #eee; margin: 20px 0;">
+    <p id="side-bio" style="line-height: 1.6; color: #444;"></p>
 </div>
 
 <div id="cy"></div>
@@ -80,63 +92,83 @@
                             selector: 'node',
                             style: {
                                 'label': 'data(name)',
-                                'width': 60, 'height': 60,
+                                'width': 65, 'height': 65,
                                 'background-image': 'data(img)',
                                 'background-fit': 'cover',
-                                'border-width': 3,
-                                'border-color': (n) => n.data('gender') === 'male' ? '#3498db' : '#e91e63',
-                                'font-size': '11px', 'text-valign': 'bottom', 'text-margin-y': 5,
-                                'text-outline-width': 2, 'text-outline-color': '#fff'
+                                'border-width': 0,
+                                'font-size': '11px', 'text-valign': 'bottom', 'text-margin-y': 6,
+                                'font-weight': 'bold', 'color': '#333'
                             }
                         },
                         {
+                            /* Male Styling */
+                            selector: 'node[gender="male"]',
+                            style: { 'border-width': 4, 'border-color': 'var(--male)' }
+                        },
+                        {
+                            /* Female Styling */
+                            selector: 'node[gender="female"]',
+                            style: { 'border-width': 4, 'border-color': 'var(--female)' }
+                        },
+                        {
+                            /* Household Box (Union) */
                             selector: ':parent',
                             style: {
-                                'background-opacity': 0.05,
-                                'background-color': '#2c3e50',
+                                'background-opacity': 1,
+                                'background-color': '#ffffff',
                                 'border-color': '#bdc3c7',
-                                'border-style': 'solid',
-                                'shape': 'roundrectangle',
-                                'padding': 40,
+                                'border-width': 1,
+                                'shape': 'rectangle',
+                                'padding': 20,
                                 'label': 'data(name)',
                                 'text-valign': 'top',
-                                'font-weight': 'bold',
-                                'font-size': '14px'
+                                'text-halign': 'center',
+                                'font-size': '12px', 'color': '#95a5a6', 'text-margin-y': -10,
+                                'shadow-blur': 10, 'shadow-color': '#000', 'shadow-opacity': 0.1
                             }
                         },
                         {
                             selector: 'edge',
                             style: {
-                                'width': 2, 'line-color': '#bbb',
-                                'target-arrow-shape': 'triangle', 'target-arrow-color': '#bbb',
+                                'width': 2, 'line-color': '#7f8c8d',
+                                'target-arrow-shape': 'triangle', 'target-arrow-color': '#7f8c8d',
                                 'curve-style': 'taxi', 'taxi-direction': 'vertical'
                             }
                         },
                         {
                             selector: '.highlighted',
-                            style: { 'line-color': '#f1c40f', 'target-arrow-color': '#f1c40f', 'width': 6, 'z-index': 999 }
+                            style: { 'line-color': '#f1c40f', 'target-arrow-color': '#f1c40f', 'width': 5 }
+                        },
+                        {
+                            selector: '.search-match',
+                            style: { 'overlay-color': '#f1c40f', 'overlay-padding': 10, 'overlay-opacity': 0.3 }
                         }
                     ],
+                    // Strict Vertical Layout
                     layout: { 
                         name: 'breadthfirst', 
                         directed: true, 
-                        spacingFactor: 1.3, 
-                        padding: 100 
+                        spacingFactor: 1.5, // Increases vertical space between generations
+                        padding: 60,
+                        avoidOverlap: true
                     }
                 });
 
                 cy.on('tap', 'node', (evt) => {
                     const node = evt.target;
-                    if (node.isParent()) return;
+                    if (node.isParent()) return; // Ignore clicks on the box
 
                     showSidebar(node.data());
                     
+                    // Pathfinding
                     pathNodes.push(node);
-                    node.style('border-width', 8);
+                    node.style('border-color', '#f1c40f'); // Temp highlight
 
                     if (pathNodes.length === 2) {
                         const aStar = cy.elements().aStar({ root: pathNodes[0], goal: pathNodes[1] });
                         if (aStar.found) aStar.path.addClass('highlighted');
+                        // Reset selection styling
+                        pathNodes.forEach(n => n.removeStyle('border-color'));
                         pathNodes = [];
                     }
                 });
@@ -144,12 +176,13 @@
     });
 
     function doSearch() {
+        cy.nodes().removeClass('search-match');
         const term = document.getElementById('searchInput').value.toLowerCase();
         if (!term) return;
         const matches = cy.nodes().filter(n => n.data('name') && n.data('name').toLowerCase().includes(term));
         if (matches.length > 0) {
-            cy.animate({ center: { eles: matches }, zoom: 1.5 }, { duration: 500 });
-            matches.flashClass('highlighted', 1000);
+            cy.animate({ center: { eles: matches }, zoom: 1.2 }, { duration: 500 });
+            matches.addClass('search-match');
         }
     }
 
@@ -164,8 +197,10 @@
     function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); }
     function clearAll() { 
         cy.elements().removeClass('highlighted'); 
-        cy.nodes().style('border-width', 3);
+        cy.nodes().removeClass('search-match');
+        pathNodes.forEach(n => n.removeStyle('border-color'));
         pathNodes = [];
+        document.getElementById('searchInput').value = '';
     }
 </script>
 </body>
