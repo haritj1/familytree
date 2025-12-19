@@ -790,14 +790,24 @@
                 
                 // 2. Render Spouse if exists
                 if (d.data.spouse) {
+                    // Draw connector line (solid pink now)
                     d3.select(this).append("line")
                         .attr("x1", config.nodeWidth/2)
                         .attr("y1", 0)
                         .attr("x2", config.spouseGap - config.nodeWidth/2)
                         .attr("y2", 0)
                         .attr("stroke", "#ff4081")
-                        .attr("stroke-width", 2)
-                        .attr("stroke-dasharray", "5,5");
+                        .attr("stroke-width", 2);
+
+                    // Add Heart Icon
+                    d3.select(this).append("text")
+                        .attr("x", config.spouseGap / 2)
+                        .attr("y", 5) // Slight vertical adjustment to center text
+                        .attr("text-anchor", "middle")
+                        .attr("alignment-baseline", "middle")
+                        .style("fill", "#ff4081")
+                        .style("font-size", "14px")
+                        .text("❤️");
 
                     renderPerson(d3.select(this), config.spouseGap, 0, d.data.spouse, true);
                 }
